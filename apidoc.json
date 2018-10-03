@@ -1,0 +1,11 @@
+{
+  "name": "Instabot Trader",
+  "version": "1.0.0",
+  "description": "Auto trade anywhere from anything.",
+  "title": "Instabot Trader",
+
+  "header": {
+    "title": "Introduction",
+    "filename": "header.md"
+  }
+}
