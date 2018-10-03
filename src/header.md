@@ -115,7 +115,7 @@ npm run setup
 ### Edit the config
 
 The last command above should have created a config file for you.
-Open `config/production.json` in your favourite editor.
+Open `config/local.json` in your favourite editor.
 
 Before Instabot Trader can place any trades, you'll need to add some API keys.
 
