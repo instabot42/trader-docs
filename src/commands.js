@@ -38,7 +38,7 @@
  * @apiVersion 1.0.0
  * @apiDescription Waits for a given amount of time before proceeding to the
  * next command...
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiParam {TimeString} duration=60s The number of seconds to wait. Can also
  *           include units, so `10` is 10 seconds, `10s` is also 10 seconds, `10m`
@@ -65,7 +65,7 @@
  * @apiName cancelOrders
  * @apiVersion 1.0.0
  * @apiDescription Attempts to cancel open orders
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiParam {String="buy","sell", "all", "session","tagged"} which=session Which orders should we cancel.<br>
  *                      `buy` will cancel all open buy orders.<br>
@@ -93,7 +93,7 @@
  * @apiName account
  * @apiVersion 1.0.0
  * @apiDescription Send a notification with account balances
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiSuccessExample Example
  *      # Place a limit order to go all in, wait 30 minutes for it to fill
@@ -109,7 +109,7 @@
  * @apiName slack
  * @apiVersion 1.0.0
  * @apiDescription Send a notification to Slack if it is configured
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiSuccessExample Example
  *      bitfinex(BTCUSD) {
@@ -124,7 +124,7 @@
  * @apiName sms
  * @apiVersion 1.0.0
  * @apiDescription Send a notification to your phone
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiSuccessExample Example
  *      bitfinex(BTCUSD) {
@@ -141,7 +141,7 @@
  * @apiName limitOrder
  * @apiVersion 1.0.0
  * @apiDescription Place a limit order.
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiParam {String="buy","sell"} [side=buy] Is this a buy or sell order. You should include this, or `position`.
  * @apiParam {Number} offset=0 The offset from the current price. For a buy order, this value is how far below
@@ -184,7 +184,7 @@
  * @apiName marketOrder
  * @apiVersion 1.0.0
  * @apiDescription Place a market order.
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiParam {String="buy","sell"} [side=buy] Is this a buy or sell order. Required if `position` is not used.
  * @apiUse AmountInfo
@@ -220,7 +220,7 @@
  * @apiName scaledOrder
  * @apiVersion 1.0.0
  * @apiDescription Place a series of limit orders over a range of prices
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiParam {Number} [from=0] The offset from the current price to start placing orders.
  * @apiParam {Number} [to=50] The offset from the current price to finish placing orders.
@@ -263,7 +263,7 @@
  *                      between all the orders. After each market order is executed there will be a delay for
  *                      `(duration / orderCount)` seconds. For example, if duration is 60 seconds, and the
  *                      orderCount is 10, then there will be a (60 / 10) = 6 second delay between each order.
- * @apiGroup Actions
+ * @apiGroup Command Reference
  *
  * @apiParam {Number} [orderCount=20] The number of orders to place.
  * @apiParam {String="buy","sell"} [side=buy] Is this a buy or sell order. Required if not using `position`
