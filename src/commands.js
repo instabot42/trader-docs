@@ -127,17 +127,21 @@
 
 
 /**
- * @api account account
- * @apiName account
+ * @api notify notify
+ * @apiName notify
  * @apiVersion 1.0.0
- * @apiDescription Send a notification with account balances
+ * @apiDescription Send a notification
  * @apiGroup Command Reference
+ *
+ * @apiParam {String="position"} what What to send in the notification.
+ *                      Account position (what=position) is the only option for now, which will cause
+ *                      an SMS with a summary of your account position to be sent to you.
  *
  * @apiSuccessExample Example
  *      # Place a limit order to go all in, wait 30 minutes for it to fill
  *      # then replace it with a market order if it wasn't filled
  *      bitfinex(BTCUSD) {
- *          account();
+ *          notify(what=position);
  *      }
  *
  */
