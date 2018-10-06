@@ -5,8 +5,32 @@
  */
 
 /**
+ * @apiDefine OffsetInfo
+ * @apiParam {Number} offset=0 The offset from the current price. For a buy order, this value is how far below
+ *                              the current price, and for sell orders, how far above the current price.
+ *                              You can also use a percentage (eg 1%). This will calculate the offset as a percentage
+ *                              of the current price. For example, if the current price is $1000 and offset is `1%`
+ *                              then the order will be placed $10 away from the current price.
+ *
+ */
+
+
+/**
+ * @apiDefine TagInfo
+ * @apiParam {String} [tag] Tag this order with the value given, so it can be canceled later in the action list with `cancelOrders()`.
+ *
+ */
+
+/**
+ * @apiDefine SideInfo
+ * @apiParam {String="buy","sell"} [side=buy] Is this a buy or sell order. Required if `position` is not used.
+ *
+ */
+
+
+/**
  * @apiDefine AmountInfo
- * @apiParam {Number} [amount=0] The size of the order. Required if `position` is not used. <br><br>
+ * @apiParam {Number} [amount=0] The size of the order.<br><br>
  *                              How the amount if interpreted depends on the exchange. Spot exchanges like
  *                              Bitfinex will treat the amount as the quantity of the asset to buy or sell.
  *                              For example, on the BTCUSD pair the amount would be measured in BTC. These
@@ -15,19 +39,33 @@
  *                              On Futures exchanges like Bitmex and Deribit, all trades are expressed in `contracts`,
  *                              so the amount would be the number of contracts to buy or sell. Normally you can only
  *                              trade a whole number of contracts, and the percentage values are not supported.<br><br>
+ *                              Required if `position` is not used.
  *
  */
 
 /**
  * @apiDefine PositionInfo
- * @apiParam {Number} [position] Target position size is only supported on Bitmex and Deribit.<br><br>
-*                                On these exchanges you can pass in the
- *                              target position size, instead of passing `side` and `amount` values.<br><br>
+ * @apiParam {Number} [position] Sets the target position size, which is the size of your open position after
+ *                              the trade completes. If you use `position`, then you do not need to use `side`
+ *                              or `amount` as these are calculated for you.<br><br>
  *                                  The amount traded will be the
  *                              difference between your current open position and the target position size.
  *                              For example, if your current position is -100 contracts (you're short 100 contracts),
- *                              and you pass in a position of 300, the an order will be placed to buy 400 contracts.
- *                              This ensures we get from the current -100 to our desired target of +300.
+ *                              and you pass in a position of 300, then an order will be placed to buy 400 contracts.
+ *                              This ensures we get from the current -100 to our desired target of +300.<br><br>
+ *                              On spot exchanges, like Bitfinex, the target amount represents the amount of the
+ *                              asset you'd like to end up with. For example, on the BTCUSD pair, position would
+ *                              represent the amount of BTC you'd like to own after the order completes. If your
+ *                              balance is current 4 btc and you set `position` to 3, it will result in a sell of
+ *                              1btc (to take you from the current 4 btc balance to teh desired 3 btc balance).
+ *                              However, if your balance was 0 btc, then it would result in a buy of 3 btc.<br<br>
+ *                              Note that the amount to actually trade is calculated from your current
+ *                              open position at the moment the
+ *                              action is executed and does not take into account other open orders.<br><br>
+ *                              If you do not have enough funds to complete the order, all available funds will be used
+ *                              to get as close as possible to the target position.<br><br>
+ *                              Required if `side` and `amount` are not used. `side` and `amount` are ignored
+ *                              if `position` is used.
  *
  */
 
@@ -78,7 +116,7 @@
  *
  * @apiSuccessExample Example
  *      # Place a limit order to go all in, wait 30 minutes for it to fill
- *      # then replace it with a market order if it wasn't filled
+ *      # then cancel the order if it's not fully filled.
  *      bitfinex(BTCUSD) {
  *          limitOrder(side=buy, amount=100%, offset=10, tag=allIn)
  *          wait(30m);
@@ -108,9 +146,16 @@
  * @api slack slack
  * @apiName slack
  * @apiVersion 1.0.0
- * @apiDescription Send a notification to Slack if it is configured
+ * @apiDescription Send a notification to Slack if the webhook is configured in the config file.
  * @apiGroup Command Reference
  *
+ *
+ * @apiParam {String} msg The message to send to slack. Use slack shortcodes for emoji.
+ * @apiParam {String} [title] The title of an attachment to include with the message.
+ * @apiParam {String} [color] The hex color to use for the attachment side bar (css style
+ *                              like #ff0000), or one of `good` (green), `warning` (yellow) or `danger` (red).
+ * @apiParam {String} [text] The text to use in the attachment area.
+
  * @apiSuccessExample Example
  *      bitfinex(BTCUSD) {
  *          slack(msg="BUY BUY BUY, MOON, LAMBO, ETC");
@@ -123,8 +168,10 @@
  * @api sms sms
  * @apiName sms
  * @apiVersion 1.0.0
- * @apiDescription Send a notification to your phone
+ * @apiDescription Send a notification to your phone, if Twilio is set up in your config
  * @apiGroup Command Reference
+ *
+ * @apiParam {String} msg The message to send to your phone using SMS.
  *
  * @apiSuccessExample Example
  *      bitfinex(BTCUSD) {
@@ -143,31 +190,26 @@
  * @apiDescription Place a limit order.
  * @apiGroup Command Reference
  *
- * @apiParam {String="buy","sell"} [side=buy] Is this a buy or sell order. You should include this, or `position`.
- * @apiParam {Number} offset=0 The offset from the current price. For a buy order, this value is how far below
- *                              the current price, and for sell orders, how far above the current price.
- *                              You can also use a percentage (eg 1%). This will calculate the offset as a percentage
- *                              of the current price. For example, if the current price is $1000 and offset is `1%`
- *                              then the order will be placed $10 away from the current price.
- * @apiUse AmountInfo
+ * @apiUse OffsetInfo
  * @apiUse PositionInfo
- * @apiParam {String} [tag] tag this order, so you can cancel it later in the action list if needed.
+ * @apiUse SideInfo
+ * @apiUse AmountInfo
+ * @apiUse TagInfo
  *
  *
- * @apiError (Compatibility) bitfinex Does not support `position`
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
  * @apiError (Compatibility) bitmex Does not support `%` or `%%` units in `amount`
  *
  *
  * @apiSuccessExample Bitfinex Example
- *      # On Bitfinex BTCUSD pair, place a limit order for 1btc
+ *      # On Bitfinex BTCUSD pair, place a limit order to buy 1btc at a price $10 below the current price
  *      bitfinex(BTCUSD) {
  *          limitOrder(side=buy, amount=1, offset=10);
  *      }
  *
  * @apiSuccessExample Deribit Example
  *      # On Deribit BTC-PERPETUAL contact, update our open position to +1000 contracts
- *      # if the price drop $50
+ *      # if the price drops $50
  *      deribit(BTC-PERPETUAL) {
  *          limitOrder(position=1000, offset=50);
  *      }
@@ -186,11 +228,10 @@
  * @apiDescription Place a market order.
  * @apiGroup Command Reference
  *
- * @apiParam {String="buy","sell"} [side=buy] Is this a buy or sell order. Required if `position` is not used.
- * @apiUse AmountInfo
  * @apiUse PositionInfo
+ * @apiUse SideInfo
+ * @apiUse AmountInfo
  *
- * @apiError (Compatibility) bitfinex Does not support `position`
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
  * @apiError (Compatibility) bitmex Does not support `%` or `%%` units in `amount`
  *
@@ -222,22 +263,21 @@
  * @apiDescription Place a series of limit orders over a range of prices
  * @apiGroup Command Reference
  *
- * @apiParam {Number} [from=0] The offset from the current price to start placing orders.
- * @apiParam {Number} [to=50] The offset from the current price to finish placing orders.
+ * @apiParam {Number} [from=0] The offset from the current price to start placing orders. See `offset` in limitOrder.
+ * @apiParam {Number} [to=50] The offset from the current price to finish placing orders. See `offset` in limitOrder.
  * @apiParam {Number} [orderCount=20] The number of orders to place between `from` and `to`.
- * @apiParam {String="buy","sell"} [side=buy] Is this a buy or sell order. Required if not using `position`
- * @apiUse AmountInfo
- * @apiUse PositionInfo
- * @apiParam {String} [tag] All the orders placed as part of the scaled order will be tagged with this.
  * @apiParam {String="linear","ease-in","ease-out","ease-in-out"} [easing=linear] The easing method to use when spacing the orders out in the range between
  *                              `from` and `to`.<br>
  *                              `linear` will place all the orders evenly spaced out between `from` and `to`.<br>
  *                              `ease-in` will bunch the orders up closer to `from`.<br>
  *                              `ease-out` will bunch up the orders closer to `to`.<br>
  *                              `ease-in-out` will bunch the orders up closer to `from` and `to` away from the middle of the range.
+ * @apiUse PositionInfo
+ * @apiUse SideInfo
+ * @apiUse AmountInfo
+ * @apiUse TagInfo
  *
  *
- * @apiError (Compatibility) bitfinex Does not support `position`
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
  * @apiError (Compatibility) bitmex Does not support `%` or `%%` units in `amount`
  *
@@ -266,14 +306,13 @@
  * @apiGroup Command Reference
  *
  * @apiParam {Number} [orderCount=20] The number of orders to place.
- * @apiParam {String="buy","sell"} [side=buy] Is this a buy or sell order. Required if not using `position`
- * @apiUse AmountInfo
- * @apiUse PositionInfo
  * @apiParam {TimeString} [duration=60s] The amount of time to spread the orders over. Supports a number in seconds,
  *                              or s, m, or h suffix for seconds, minutes and hours (eg 5m = 5 minutes, 2h = 2 hours)
+ * @apiUse PositionInfo
+ * @apiUse SideInfo
+ * @apiUse AmountInfo
  *
  *
- * @apiError (Compatibility) bitfinex Does not support `position`
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
  * @apiError (Compatibility) bitmex Does not support `%` or `%%` units in `amount`
  *

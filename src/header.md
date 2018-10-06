@@ -2,6 +2,9 @@
 * [Configuration](#api-config)  
 * [Command Reference](#sections)
 
+> **DISCLAIMER:** *This package is in development and makes no guarantee that it is able to do any of 
+the things described here. Use only at your own risk.*  
+
 
 <h1 id="api-intro">Introduction</h1>
 
@@ -10,9 +13,9 @@
 Trigger your trades from...
 
 * TradingView alerts
+* Anything that can send an HTTP request.
 * A simple form on a web page (example included)
 * email or SMS
-* Anything that can send an HTTP request (IFTTT, Zapier etc)
 * even from the command line, if that's your thing.
 
 Place simple limit orders or complex sequences of trades...
@@ -23,10 +26,17 @@ Place simple limit orders or complex sequences of trades...
 * Send yourself notifications (SMS or Slack) of progress and account balances / status.
 * Chains of the above (for example, scaled order, wait a while, cancel unfilled orders, replace with market orders etc)
 
+## Donation (please...) 
+
+If you're using this, would be nice if you made a donation to my lambo fund.
+
+* Bitcoin: [39vBjyAu65vYEd7thnW75V7eULTcz7wgxV](bitcoin:39vBjyAu65vYEd7thnW75V7eULTcz7wgxV)
+* Litecoin: LUov5izfzuDakBeLGGCtyzmZcwCB2nXBDY
+* Eth: 0x2F18958381D3a1025e136b5AEF727dDa132602f8
+ 
+
 <br>
 
-> **DISCLAIMER:** *This package is in development and makes no guarantee that it is able to do any of 
-the things described here. Use only at your own risk.*  
 
 ## How?
 
