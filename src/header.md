@@ -26,6 +26,9 @@ Place simple limit orders or complex sequences of trades...
 * Send yourself notifications (**SMS** or **Slack**) of progress and account balances / status.
 * Chains of the above (for example, scaled order, wait a while, cancel unfilled orders, 
   replace with market orders etc)
+  
+Do you fear the dredded 'system overload' messages on Bitmex. Instbot Trader will repeatably 
+retry your orders to maximise the chance of them getting through the log jam.
 
 <div id="donate">
 
@@ -54,10 +57,15 @@ Each message looks a bit like this...
 
 ```
 Any text you like here...
+Want this text sent as an SMS to your phone? 
+then add this somewhere-> {!}
+
+Next, we have a set of actions that 
+will be executed on an exchange...
 
 exchangeName( instrument ) {
-    action1(value1, value2);
-    action2(value1, value2);
+    action1(value1=x, value2=y);
+    action2(value1=x, value2=y);
 }
 
 You can have more action lists here, so you can execute commands
@@ -104,10 +112,13 @@ See the setup guides for more details.
 
 ## Which exchanges are supported?
 
-* [Bitfinex](https://www.bitfinex.com/) - Spot Exchange
+* [Bitfinex](https://www.bitfinex.com/) - Spot Trading (support for margin trading soon)
 * [Deribit](https://www.deribit.com/reg-1657.8470) - Bitcoin Futures
-* [Bitmex](https://www.bitmex.com/register/LWpOVZ) - 100x degen trading
-* Coming soon: Binance 
+* Coming soon: [Bitmex](https://www.bitmex.com/register/LWpOVZ) - 100x degen gambling
+* Coming soon: Binance - shitcoin party 
+
+
+--------
 
 
 <h1 id="api-setup">Setup Guide</h1>
@@ -164,6 +175,8 @@ Open up `instabot.html` from the project and you'll get a simple web page that y
 the bot locally. From here you'll be able to FOMO in, or layout out a spread of orders in a single click, without
 having to log into your exchange accounts or fight system overload messages.
 
+
+--------
 
 # Advanced Setup (for full automation)
 
@@ -240,10 +253,95 @@ of the page. You'll also need to set up that email address so it is forwarded to
 some tips on doing this above.
 
 
-## Set up an SMS listener
+## Set up SMS
+
+This is actually pretty simple. 
+
+* Create a Twilio account
+* To be able to send SMS messages out (for alerts or account updates), grab the API Credentials from 
+  the Programmable SMS section and put these into your `config/local.json`, along with the number you'd
+  like the messages to be sent to.
+* To receive SMS messages that are routed to Instabot Trader, create a new number and set it up 
+  to call a webhook when a message comes in. Enter the URL for your server and set it to HTTP POST.
+  Any SMS sent to that number will be passed on to your server now.
+
+  
+  
+---------
 
 
-## Set up PM2 to ensure your new bot stays running.
+<h1 id="api-format">Message Format</h1>
 
-## How to write messages
+When a message is received, the following elements are looked for...
 
+### {!}
+
+An explanation mark in curly brackets tell Instabot Trader to take all the text that is not
+part of a command / action list and send it to your phone (assuming your have SMS set up).
+
+This is great for simple SMS alerts. For example, set up an alert in TradingView when the 
+price crosses an important line and set the alert text like this...
+
+```
+BTC now over 10K! {!} 
+```
+
+You'll get an SMS with the message 'BTC now over 10K!'. There are no commands in the message,
+so that's all that will happen.
+
+### Actions and commands
+
+You can have as many of these as you like in a message. This makes it possible to trigger something
+that will happen on multiple exchanges, or on multiple pairs/instruments on an exchange. 
+All the blocks are executed simultaneously, allowing
+you to be placing orders on different exchanges / pairs at the same time.
+
+Lets look at an example and break it down so you can understand all the parts...
+
+```
+Going Long {!}
+
+bitfinex(BTCUSD) {
+   limitOrder(side=buy, amount=1, offset=5);
+   slack(msg="Order placed, on Bitfinex, for 1 BTC");
+}
+
+deribit(BTC-PERPETUAL) {
+   scaledOrder(position=10000, from=0, to=50, orderCount=30);
+   wait(30m);
+   cancelOrders(session);
+   marketOrder(position=10000);
+}
+```
+
+First up, we'll get sent an SMS with the message 'Going Long'.
+
+Next, there are 2 blocks. One will target Bitfinex and the second will target Deribit to place orders. Both will
+be executed at the same time.
+
+The Bitfinex blocks starts by indicating which pair to trade on (BTCUSD in this example). The list of actions
+to run on the Bitfinex BTCUSD pair are contained between the open and close curly brackets. Each action looks
+like a function call. It starts with the name of the command, then a list of parameters inside brackets. 
+An optional semi-colon can be seen in the example too.
+
+The arguments are all named (meaning they all take the form of `name = value`)and can be listed in any order.
+Each parameter is separated by a comma. The Bitfinex limitOrder action in the example above has 3 parameters - 
+`side`, `amount` and `offset`. You'll notice that the `slack` action uses double quotes around it's value.
+This is necessary as the value contains commas, but is optional if it does not.
+
+The actions in the block are executed one at a time. So in the Bitfinex example, the first command is
+a limitOrder command. Note that it does not wait for the order to
+be filled - it only waits until the order has been submitted and accepted by the exchange. Once the limit
+order has been placed, it moves on to the second action (sending a notification to slack).
+
+The Deribit example shows this ordering more clearly. It will attempt to get into a position cheaply
+using limit orders over a small price range. It will give this 30 minutes to work, then fall back to a market
+order to finalise the position if any of the limit orders were still unfilled.
+
+First we place a scaled order, which actually results
+in Instabot Trader placing 30 separate limit orders. How long this takes depends on the rate limits at the
+exchange and for your account (Deribit has pretty high limits, so can probably place all the orders in a
+fraction of a second. The same command on Bitfinex would take a lot longer to execute as it has much lower
+rate limits). Once all the orders are placed, it goes on to the second action, which just waits for 30 minutes.
+After 30 minutes it will cancel any outstanding orders that were created by the scaled order action and finally
+place a market order to get us fully into position. 
