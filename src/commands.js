@@ -257,6 +257,52 @@
  */
 
 
+/**
+ * @api stopMarketOrder stopMarketOrder
+ * @apiName stopMarketOrder
+ * @apiVersion 1.0.0
+ * @apiDescription Place a stop market order. Where supported, the order will be placed with 'reduce only' enabled
+ *                  to ensure it can only reduce your position size (not increase it). Currently this is only
+ *                  supported for Bitmex. <br><br>Take care using `position` for stop orders, as the size of the order
+ *                  is calculated at the time the order is placed, not when it is executed. For example, if you
+ *                  have no open positions and trigger a limit order, then immediately a stop order, the limit order
+ *                  will not have been filled yet when the stop order is placed, so your position is likely to
+ *                  still be zero. Instead, use a market order to get into position, or wait after placing the limit
+ *                  order (though there is still a risk it won't have been fully filled), or don't use `position`
+ *                  to set the size of your stop orders.
+ * @apiGroup Command Reference
+ *
+ * @apiUse PositionInfo
+ * @apiUse SideInfo
+ * @apiUse AmountInfo
+ * @apiUse TagInfo
+ * @apiParam {Number} offset=0 The offset from the current price. This is similar to `offset` in other
+ *                              order types. However, buy order will be offset to a price higher than the current
+ *                              price, and sells will be offset to a price lower.
+ * @apiParam {String="index","mark","last"} [trigger=mark] Determine which price to trigger the stop order on, if supported.
+ *                      `index` represents the underlying index price, `mark` is the mark price and `last` is the last traded price.
+ *
+ * @apiError (Compatibility) deribit Only supports `mark` and `index` triggers
+ * @apiError (Compatibility) bitfinex trigger is ignored.
+ *
+ *
+ * @apiSuccessExample Bitfinex Example
+ *      # On Bitfinex BTCUSD pair, place a market order for 1btc and a stop loss 1% below entry
+ *      bitfinex(BTCUSD) {
+ *          marketOrder(side=buy, amount=1);
+ *          stopMarketOrder(side=sell, amount=1, offset=1%)
+ *      }
+ *
+ * @apiSuccessExample Deribit Example
+ *      # On Deribit BTC-PERPETUAL contact, update our open position to +1000 contracts
+ *      # and set it up a stop loss market order if the price drops 1% from here.
+ *      deribit(BTC-PERPETUAL) {
+ *          marketOrder(position=1000);
+ *          stopMarketOrder(side=sell, amount=1000, offset=1%)
+ *      }
+ *
+ *
+ */
 
 
 

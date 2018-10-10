@@ -1,6 +1,8 @@
 * [Setup Guide](#api-setup)
-* [Configuration](#api-config)  
+* [Message Format](#api-format)    
+* [Macros](#api-macros)
 * [Command Reference](#sections)
+* [License](#api-_footer)
 
 > **DISCLAIMER:** *This package is in development and makes no guarantee that it is able to do any of 
 the things described here. Use only at your own risk.*  
@@ -13,9 +15,9 @@ the things described here. Use only at your own risk.*
 Trigger your trades from...
 
 * **TradingView alerts**
-* Anything that can send an HTTP request.
-* A simple form on a web page (example included)
-* email or SMS
+* **Telegram**
+* Anything that can send an HTTP request (A simple web form, Zapier, 
+  email routers like Mailgun, SMS routers like Twilio, etc).
 * even from the command line, if that's your thing.
 
 Place simple limit orders or complex sequences of trades...
@@ -125,12 +127,12 @@ See the setup guides for more details.
 
 ## Installation
 
-You'll need **[Node.js](https://nodejs.org/en/)** to run Instabot Trader. Tested on Node V8.7.0, 
-though v10.11.0 or better would be ideal.
+You'll need **[Node.js](https://nodejs.org/en/)** v10.3.0 or better to run Instabot Trader.
 
 So, clone or copy the source code to a new folder, then...
 
 ```bash
+$ git clone https://github.com/instabot42/instabot-trader.git
 $ cd instabot-trader
 $ npm install
 $ npm run setup
@@ -147,8 +149,14 @@ There are several sections here that you can adjust...
 * **Credentials** - add the API keys for each of the exchanges you want to trade on to this section
 * **SMS** - Instabot Trader has a built in Twilio integration. If you have a Twilio account you can set
             up the credentials, 'from' phone number and your phone number to send alerts to.
-* **Slack** - You can have notifications sent to a slack channel. Set up the webhook here. 
+* **Slack** - You can have notifications sent to a slack channel. Set up the webhook here.
+* **Telegram** - If you want to talk to Instabot Trader from Telegram, you'll need to create a bot
+                 (see [the botFather](https://core.telegram.org/bots#6-botfather)) and add the botToken
+                 to the config. Once you've done that, start a chat with your new bot and have it send
+                 messages executed instantly. See the section on Telegram for the commands and shortcuts.
 * **Server** - here you can change the URL that your server is accessed from, and the port that it listens on
+* **Macros** - See the section on macros for more details. TLDR; define long lists of commands and trigger the 
+            whole list with a single new command. 
 
 You'll need to get an API key and secret from each of the exchanges you want to trade on.
 Once you have these, update `local.json` with them and you're ready to start.   
@@ -169,11 +177,6 @@ $ npm run start
 
 That's it, you're up and running...
 
-## Using the bot locally
-
-Open up `instabot.html` from the project and you'll get a simple web page that you can use to manually control
-the bot locally. From here you'll be able to FOMO in, or layout out a spread of orders in a single click, without
-having to log into your exchange accounts or fight system overload messages.
 
 
 --------
@@ -266,6 +269,30 @@ This is actually pretty simple.
   Any SMS sent to that number will be passed on to your server now.
 
   
+## Set up Telegram
+
+Before you can use the Telegram integration you'll need to create a telegram bot. Don't worry, it's
+easier than it sounds...
+
+* First, in Telegram, you'll need to start a chat with @botFather to create your own chat bot token. 
+  There are detailed instructions at 
+  [https://core.telegram.org/bots#6-botfather](https://core.telegram.org/bots#6-botfather).
+* Once you have a token, you can add it to the config in `config/local.json` and restart Instabot Trader.
+* Now you can start a chat with your new bot. Type `/help` for the help text.
+* Anything you say to the telegram bot will now to sent directly to Instabot Trader and will be treated
+  as a regular message (commands and all).
+* To make things even simpler you can create some shortcuts that you can trigger 
+  Telegram using `/shortcut <name>`. The shortcuts are defined in your `config/local.json` as an array
+  of objects. The example below can be executed using `/shortcut example`...
+  
+```
+{ 
+    "name": "example", 
+    "message": "Testing... bitfinex(BTCUSD) { wait(5s); } "
+}
+```
+
+
   
 ---------
 
@@ -276,7 +303,7 @@ When a message is received, the following elements are looked for...
 
 ### {!}
 
-An explanation mark in curly brackets tell Instabot Trader to take all the text that is not
+An explanation mark in curly brackets tells Instabot Trader to take all the text that is not
 part of a command / action list and send it to your phone (assuming your have SMS set up).
 
 This is great for simple SMS alerts. For example, set up an alert in TradingView when the 
@@ -345,3 +372,33 @@ fraction of a second. The same command on Bitfinex would take a lot longer to ex
 rate limits). Once all the orders are placed, it goes on to the second action, which just waits for 30 minutes.
 After 30 minutes it will cancel any outstanding orders that were created by the scaled order action and finally
 place a market order to get us fully into position. 
+
+
+---------
+
+
+<h1 id="api-macros">Macros</h1>
+
+In your `config/local.json` file you can define macros. These are simple shortcuts to a list of
+commands to execute and lets you define your own commands.
+
+Each macro looks a bit like this...
+
+```
+{
+    "name": "myAction",
+    "actions": [ "limitOrder(position=1, offset=5);", "notify(position)"]
+}
+```
+
+So this defines a macro called `myAction` that will execute 2 commands (the limitOrder and notify commands shown).
+You can use it like this...
+
+```
+bitfinex(BTCUSD) { myAction(); }
+```
+
+So why bother? It means shorter messages which can be really useful when they are set up in places that are hard
+to change or update. Instead you can just update the config and restart the bot and you get the new command 
+sequence next time the macro is triggered. It also means you don't need to reveal exactly what orders etc you'll
+be executing to the service that is triggering the action. 
