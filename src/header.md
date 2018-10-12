@@ -116,6 +116,7 @@ See the setup guides for more details.
 
 * [Bitfinex](https://www.bitfinex.com/) - Spot Trading (support for margin trading soon)
 * [Deribit](https://www.deribit.com/reg-1657.8470) - Bitcoin Futures
+* [Coinbase Pro](https://pro.coinbase.com/trade/BTC-USD) - Spot Trading (BTC, LTC, ETH and Bcash)
 * Coming soon: [Bitmex](https://www.bitmex.com/register/LWpOVZ) - 100x degen gambling
 * Coming soon: Binance - shitcoin party 
 
@@ -176,6 +177,9 @@ $ npm run start
 ```
 
 That's it, you're up and running...
+<br><br>
+**Very strongly recommend that you start out using very small amounts until you've figured it all out.**
+**Even better, start by using only the wait() command, which won't place any trades.**
 
 
 

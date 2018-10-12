@@ -6,11 +6,11 @@
 
 /**
  * @apiDefine OffsetInfo
- * @apiParam {Number} offset=0 The offset from the current price. For a buy order, this value is how far below
- *                              the current price, and for sell orders, how far above the current price.
- *                              You can also use a percentage (eg 1%). This will calculate the offset as a percentage
- *                              of the current price. For example, if the current price is $1000 and offset is `1%`
- *                              then the order will be placed $10 away from the current price.
+ * @apiParam {Number} offset=0 The offset from the current price or absolute price. Examples...<br><br>
+ *                              `50` - offset $50 from the current price (below for buys, above for sells)<br>
+ *                              `5%` - offset 5% of the current price (eg price is $1000, offset $50 from it)<br>
+ *                              `@950` - absolute price of 950, regardless of what the current price is
+ *                              (so not an offset at all really, but still useful).
  *
  */
 
@@ -315,7 +315,7 @@
  *
  * @apiParam {Number} [from=0] The offset from the current price to start placing orders. See `offset` in limitOrder.
  * @apiParam {Number} [to=50] The offset from the current price to finish placing orders. See `offset` in limitOrder.
- * @apiParam {Number} [orderCount=20] The number of orders to place between `from` and `to`.
+ * @apiParam {Number{1-50}} [orderCount=20] The number of orders to place between `from` and `to`.
  * @apiParam {String="linear","ease-in","ease-out","ease-in-out"} [easing=linear] The easing method to use when spacing the orders out in the range between
  *                              `from` and `to`.<br>
  *                              `linear` will place all the orders evenly spaced out between `from` and `to`.<br>
