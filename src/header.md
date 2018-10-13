@@ -25,7 +25,7 @@ Place simple limit orders or complex sequences of trades...
 * **Scaled orders**, even on exchanges that don't offer this (like Bitmex and Deribit)
 * **Stepped market orders** (a series of market orders spread over a period of time)
 * Basic limit, market and stop orders
-* Send yourself notifications (**SMS** or **Slack**) of progress and account balances / status.
+* Send yourself notifications (**SMS**, **Slack** and **Telegram**) of progress and account balances / status.
 * Chains of the above (for example, scaled order, wait a while, cancel unfilled orders, 
   replace with market orders etc)
   
@@ -155,6 +155,8 @@ There are several sections here that you can adjust...
                  (see [the botFather](https://core.telegram.org/bots#6-botfather)) and add the botToken
                  to the config. Once you've done that, start a chat with your new bot and have it send
                  messages executed instantly. See the section on Telegram for the commands and shortcuts.
+* **Notifications** - Set up the default notification channel (or channels) and control if you get sent a 
+                notification when Instabot Trader starts up.                  
 * **Server** - here you can change the URL that your server is accessed from, and the port that it listens on
 * **Macros** - See the section on macros for more details. TLDR; define long lists of commands and trigger the 
             whole list with a single new command. 
@@ -272,6 +274,12 @@ This is actually pretty simple.
   to call a webhook when a message comes in. Enter the URL for your server and set it to HTTP POST.
   Any SMS sent to that number will be passed on to your server now.
 
+
+## Set up Slack
+
+* In slack create a new Webhook URL to send messages to the channel you want and paste it into the 
+    `config/local.json` (slack -> webhook). 
+   
   
 ## Set up Telegram
 
@@ -296,7 +304,12 @@ easier than it sounds...
 }
 ```
 
+## Notifications
 
+* **alertOnStartup** should be true or false. If true, a notification will be sent each time 
+        Instabot Trader starts.
+* **default** is an array containing the names of the channels to send messages to. If you provide
+        more than one channel, messages will be sent to all listed channels.
   
 ---------
 
@@ -308,24 +321,26 @@ When a message is received, the following elements are looked for...
 ### {!}
 
 An explanation mark in curly brackets tells Instabot Trader to take all the text that is not
-part of a command / action list and send it to your phone (assuming your have SMS set up).
+part of a command / action list and send it to your default notification channel (notification channels
+are configured in your `local.json` config).
 
-This is great for simple SMS alerts. For example, set up an alert in TradingView when the 
+This is great for simple alerts. For example, set up an alert in TradingView when the 
 price crosses an important line and set the alert text like this...
 
 ```
 BTC now over 10K! {!} 
 ```
 
-You'll get an SMS with the message 'BTC now over 10K!'. There are no commands in the message,
-so that's all that will happen.
+You'll get a message 'BTC now over 10K!' sent to you on your configured channels (SMS, Slack or Telegram). 
+There are no commands in the message, so that's all that will happen.
 
 ### Actions and commands
 
 You can have as many of these as you like in a message. This makes it possible to trigger something
 that will happen on multiple exchanges, or on multiple pairs/instruments on an exchange. 
-All the blocks are executed simultaneously, allowing
-you to be placing orders on different exchanges / pairs at the same time.
+All the exchange blocks are executed simultaneously, allowing
+you to be placing orders on different exchanges / pairs at the same time. The commands inside each block
+are executed one at a time.
 
 Lets look at an example and break it down so you can understand all the parts...
 
@@ -334,7 +349,7 @@ Going Long {!}
 
 bitfinex(BTCUSD) {
    limitOrder(side=buy, amount=1, offset=5);
-   slack(msg="Order placed, on Bitfinex, for 1 BTC");
+   notify(msg="Order placed, on Bitfinex, for 1 BTC");
 }
 
 deribit(BTC-PERPETUAL) {
@@ -357,13 +372,13 @@ An optional semi-colon can be seen in the example too.
 
 The arguments are all named (meaning they all take the form of `name = value`)and can be listed in any order.
 Each parameter is separated by a comma. The Bitfinex limitOrder action in the example above has 3 parameters - 
-`side`, `amount` and `offset`. You'll notice that the `slack` action uses double quotes around it's value.
+`side`, `amount` and `offset`. You'll notice that the `notify` action uses double quotes around it's value.
 This is necessary as the value contains commas, but is optional if it does not.
 
 The actions in the block are executed one at a time. So in the Bitfinex example, the first command is
 a limitOrder command. Note that it does not wait for the order to
 be filled - it only waits until the order has been submitted and accepted by the exchange. Once the limit
-order has been placed, it moves on to the second action (sending a notification to slack).
+order has been placed, it moves on to the second action (sending a notification (SMS, Slack and Telegram supported)).
 
 The Deribit example shows this ordering more clearly. It will attempt to get into a position cheaply
 using limit orders over a small price range. It will give this 30 minutes to work, then fall back to a market
@@ -391,11 +406,11 @@ Each macro looks a bit like this...
 ```
 {
     "name": "myAction",
-    "actions": [ "limitOrder(position=1, offset=5);", "notify(position)"]
+    "actions": [ "limitOrder(position=1, offset=5);", "balance()"]
 }
 ```
 
-So this defines a macro called `myAction` that will execute 2 commands (the limitOrder and notify commands shown).
+So this defines a macro called `myAction` that will execute 2 commands (the limitOrder and balance commands shown).
 You can use it like this...
 
 ```

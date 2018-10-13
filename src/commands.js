@@ -127,64 +127,43 @@
 
 
 /**
- * @api notify notify
- * @apiName notify
+ * @api balance balance
+ * @apiName balance
  * @apiVersion 1.0.0
- * @apiDescription Send a notification
+ * @apiDescription Send a notification to your default notification channels with a balance report for the exchange and instrument the command is running in.
  * @apiGroup Command Reference
  *
- * @apiParam {String="position"} what What to send in the notification.
- *                      Account position (what=position) is the only option for now, which will cause
- *                      an SMS with a summary of your account position to be sent to you.
- *
  * @apiSuccessExample Example
- *      # Place a limit order to go all in, wait 30 minutes for it to fill
- *      # then replace it with a market order if it wasn't filled
+ *      # send me a notification with the balance of the BTCUSD pair on Bitfinex
  *      bitfinex(BTCUSD) {
- *          notify(what=position);
+ *          balance()
  *      }
  *
  */
 
 /**
- * @api slack slack
- * @apiName slack
+ * @api notify notify
+ * @apiName notify
  * @apiVersion 1.0.0
- * @apiDescription Send a notification to Slack if the webhook is configured in the config file.
+ * @apiDescription Send a notification to one of the supported notification channels
  * @apiGroup Command Reference
  *
  *
- * @apiParam {String} msg The message to send to slack. Use slack shortcodes for emoji.
+ * @apiParam {String} msg The message to send. Use slack shortcodes for emoji when sending to Slack.
  * @apiParam {String} [title] The title of an attachment to include with the message.
  * @apiParam {String} [color] The hex color to use for the attachment side bar (css style
  *                              like #ff0000), or one of `good` (green), `warning` (yellow) or `danger` (red).
  * @apiParam {String} [text] The text to use in the attachment area.
-
- * @apiSuccessExample Example
- *      bitfinex(BTCUSD) {
- *          slack(msg="BUY BUY BUY, MOON, LAMBO, ETC");
- *      }
- *
- */
-
-
-/**
- * @api sms sms
- * @apiName sms
- * @apiVersion 1.0.0
- * @apiDescription Send a notification to your phone, if Twilio is set up in your config
- * @apiGroup Command Reference
- *
- * @apiParam {String} msg The message to send to your phone using SMS.
+ * @apiParam {String="sms","slack","telegram"} [who=default] Which channel to send the message to. By default it sends to the channel
+ *                          configured in your `config/local.json` file, but you can specify the channel here.
+ *                          SMS, Slack and Telegram are support channels.
  *
  * @apiSuccessExample Example
  *      bitfinex(BTCUSD) {
- *          sms(msg="BUY BUY BUY, MOON, LAMBO, ETC");
+ *          notify(msg="BUY BUY BUY, MOON, LAMBO, ETC");
  *      }
  *
  */
-
-
 
 
 /**
