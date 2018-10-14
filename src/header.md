@@ -1,6 +1,7 @@
 * [Setup Guide](#api-setup)
 * [Message Format](#api-format)    
 * [Macros](#api-macros)
+* [Examples](#api-examples)
 * [Command Reference](#sections)
 * [License](#api-_footer)
 
@@ -110,6 +111,15 @@ that can make HTTP requests will be able to trigger the bot to execute
 trades for you. It's possible to set it up to respond to emails, SMS messages
 or to build a simple html page that sends commands when you click a button. 
 See the setup guides for more details. 
+
+By default the bot listens at `http://localhost:3000/trade`, though both the port and path
+can be configured in the config.
+
+`POST` messages to this URL, with your message in value called `message`, `subject` or `Body`.
+
+```
+curl --data-urlencode "message=hello world" http://localhost:3000/trade
+```
 
 
 ## Which exchanges are supported?
