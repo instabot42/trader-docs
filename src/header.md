@@ -83,18 +83,18 @@ bid in $50 below the current price...
 bitfinex(BTCUSD) { limitOrder(side=buy, amount=1btc, offset=50); } 
 ```
 
-or how about place a scaled order on Bitmex's perpetual swap (XBTUSD). Same amount, but lets
+or how about place a scaled order on Deribit's perpetual swap (BTC-PERPETUAL). Same amount, but lets
 spread it over 25 orders from $20 below the current price, down to $70
 below the current price...
 
 ```
-Scaling in on mex...
-bitmex(XBTUSD) { 
+Scaling in on perps...
+deribit(BTC-PERPETUAL) { 
   scaledOrder(side=buy, amount=1btc, from=20, to=70, orderCount=25); 
 } 
 ```
 
-Easy.
+Easy. You'll find **[more examples here...](#api-examples)**
 
 ## But how do I send these messages?
 
@@ -421,3 +421,113 @@ So why bother? It means shorter messages which can be really useful when they ar
 to change or update. Instead you can just update the config and restart the bot and you get the new command 
 sequence next time the macro is triggered. It also means you don't need to reveal exactly what orders etc you'll
 be executing to the service that is triggering the action. 
+
+
+<h1 id="api-examples">Examples</h1>
+
+#### Place a market order to buy 1 btc
+
+```
+bitfinex(BTCUSD) {
+    marketOrder(side=buy, amount=1)
+}
+```
+
+#### Adjust your open position so you own 1 btc, using a market order
+
+```
+bitfinex(BTCUSD) {
+    marketOrder(position=1)
+}
+```
+
+#### Place a limit order at $10 below the current price
+
+```
+bitfinex(BTCUSD) {
+    limitOrder(side=buy, amount=1, offset=10);
+}
+```
+
+#### Adjust your open position so you own 1 btc using a limit order
+
+```
+bitfinex(BTCUSD) {
+    limitOrder(position=1, offset=10);
+}
+```
+
+#### Kill everything - close all orders and close open positions
+
+This works by cancelling all open orders and aiming for an open position of 0 contracts. 
+If the account was long, this would turn into a market sell. If short, a market buy. 
+If there were no open positions, no trade would be placed.
+
+```
+deribit(BTC-PERPETUAL) {
+    cancelOrders(all);
+    marketOrder(position=0);
+}
+```
+
+#### Get your balance at Bitfinex and Deribit
+
+Notification will be sent to your preferred channel (one or many of SMS, Telegram or Slack)
+
+```
+deribit(BTC-PERPETUAL) { balance() }
+bitfinex(BTCUSD) { balance() }
+```
+
+#### Just send a message
+
+(to your preferred notification channels)
+
+```
+This text will be sent to SMS, Telegram or Slack {!}
+```
+
+#### Enter a long position of 10,000 contracts over a period of time
+
+A more complex example. This will place 30 limit orders over a $50 range,
+with the aim of ending up 10,000 contracts long. After 30 minutes, cancel
+anything not yet filled and place a new range of orders in a tighter range
+close to the current price again. Wait again, cancel anything not filled again
+and finally market buy any missing contracts. At the end, send a balance
+report. The whole sequence will take around 1 hour to complete.
+
+```
+Going Long {!}
+deribit(BTC-PERPETUAL) {
+    scaledOrder(from=0, to=50, orderCount=30, position=10000, tag=firstGo);
+    wait(duration=30m);
+    cancelOrders(which=tagged, tag=firstGo);
+    scaledOrder(from=0, to=20, orderCount=30, position=10000, tag=secondGo);
+    wait(duration=30m);
+    cancelOrders(which=tagged, tag=secondGo);
+    marketOrder(position=10000);
+    balance();
+}
+```
+
+#### Open a short position and set a stop loss $100 higher
+
+```
+deribit(BTC-PERPETUAL) {
+    marketOrder(position=-1000);
+    stopMarketOrder(side=buy, amount=1000, offset=100);
+}
+```
+
+
+#### Place a series of market orders over a 10 minute period
+
+This will be done using 20 market orders at 30 second intervals. Once
+the sequence is complete you will have an open position of 1000 contracts
+(regardless of what your open position was at the start)
+
+```
+deribit(BTC-PERPETUAL) {
+    steppedMarketOrder(orderCount=20, duration=10m, position=1000);
+}
+```
