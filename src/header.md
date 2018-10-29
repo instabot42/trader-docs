@@ -1,6 +1,5 @@
 * [Setup Guide](#api-setup)
 * [Message Format](#api-format)    
-* [Macros](#api-macros)
 * [Examples](#api-examples)
 * [Command Reference](#sections)
 * [License](#api-_footer)
@@ -23,33 +22,20 @@ Trigger your trades from...
 
 Place simple limit orders or complex sequences of trades...
 
-* **Scaled orders**, even on exchanges that don't offer this (like Bitmex and Deribit)
+* **Iceberg orders** & **Scaled orders**, even on exchanges that don't offer this (like coinbase pro and Deribit)
 * **Stepped market orders** (a series of market orders spread over a period of time)
 * Basic limit, market and stop orders
 * Send yourself notifications (**SMS**, **Slack** and **Telegram**) of progress and account balances / status.
 * Chains of the above (for example, scaled order, wait a while, cancel unfilled orders, 
   replace with market orders etc)
   
-Do you fear the dredded 'system overload' messages on Bitmex. Instbot Trader will repeatably 
-retry your orders to maximise the chance of them getting through the log jam.
-
 <div id="donate">
 
-## All donations gratefully accepted! 👊 
+## Source code?
 
-If you're using this to help you trade 24/7, it would be great if you could throw me a few Satoshi 
-from time to time to say thanks. 
-
-* **Bitcoin**: 39vBjyAu65vYEd7thnW75V7eULTcz7wgxV
-* **Litecoin**: LUov5izfzuDakBeLGGCtyzmZcwCB2nXBDY
-* **Ethereum**: 0x2F18958381D3a1025e136b5AEF727dDa132602f8
-
-Thank you... 🎉 
+[https://github.com/instabot42/instabot-trader](https://github.com/instabot42/instabot-trader)
 
 </div>
-
-<br>
-
 
 ## What does it do? How does it work?
 
@@ -131,6 +117,23 @@ curl --data-urlencode "message=hello world" http://localhost:3000/trade
 * Coming soon: Binance - shitcoin party 
 
 
+<div id="donate">
+
+## All donations gratefully accepted!
+
+If you're using this to help you trade 24/7, it would be great if you could throw me a few Satoshi 
+from time to time to say thanks. 
+
+* **Bitcoin**: 39vBjyAu65vYEd7thnW75V7eULTcz7wgxV
+* **Litecoin**: LUov5izfzuDakBeLGGCtyzmZcwCB2nXBDY
+* **Ethereum**: 0x2F18958381D3a1025e136b5AEF727dDa132602f8
+
+Thank you... 🎉 
+
+</div>
+
+<br>
+
 --------
 
 
@@ -157,10 +160,13 @@ Open `config/local.json` in your favourite editor.
 
 There are several sections here that you can adjust...
 
-* **Credentials** - add the API keys for each of the exchanges you want to trade on to this section
-* **SMS** - Instabot Trader has a built in Twilio integration. If you have a Twilio account you can set
+* **Credentials** - add the API keys for each of the exchanges you want to trade on to this section.
+            You can create API Keys at each exchange. You'll need to give the keys permission to 
+            read/create/delete orders, as well as read permission for your wallet.<br>
+            **DO NOT CREATE KEYS WITH PERMISSION TO DO MORE THAN YOU NEED** - it's just careless.
+* **SMS** - Instabot Trader has a built in [Twilio](https://www.twilio.com/) integration. If you have a Twilio account you can set
             up the credentials, 'from' phone number and your phone number to send alerts to.
-* **Slack** - You can have notifications sent to a slack channel. Set up the webhook here.
+* **Slack** - You can have notifications sent to a slack channel. Set up the [webhook](https://api.slack.com/incoming-webhooks) here.
 * **Telegram** - If you want to talk to Instabot Trader from Telegram, you'll need to create a bot
                  (see [the botFather](https://core.telegram.org/bots#6-botfather)) and add the botToken
                  to the config. Once you've done that, start a chat with your new bot and have it send
@@ -168,8 +174,6 @@ There are several sections here that you can adjust...
 * **Notifications** - Set up the default notification channel (or channels) and control if you get sent a 
                 notification when Instabot Trader starts up.                  
 * **Server** - here you can change the URL that your server is accessed from, and the port that it listens on
-* **Macros** - See the section on macros for more details. TLDR; define long lists of commands and trigger the 
-            whole list with a single new command. 
 
 You'll need to get an API key and secret from each of the exchanges you want to trade on.
 Once you have these, update `local.json` with them and you're ready to start.   
@@ -256,7 +260,7 @@ Here we'll cover setting up MailGun to do this, though you can use any service y
 
 ## Set up TradingView
 
-TradingView has a very powerful alerting system, allowing you to trigger an alert when any combination of
+[TradingView](https://www.tradingview.com/) has a very powerful alerting system, allowing you to trigger an alert when any combination of
 indicators do something you consider important. You can also write your own indicators in PineScript and have
 those fire alerts when interesting things happen too.
 
@@ -404,33 +408,6 @@ place a market order to get us fully into position.
 
 
 ---------
-
-
-<h1 id="api-macros">Macros</h1>
-
-In your `config/local.json` file you can define macros. These are simple shortcuts to a list of
-commands to execute and lets you define your own commands.
-
-Each macro looks a bit like this...
-
-```
-{
-    "name": "myAction",
-    "actions": [ "limitOrder(position=1, offset=5);", "balance()"]
-}
-```
-
-So this defines a macro called `myAction` that will execute 2 commands (the limitOrder and balance commands shown).
-You can use it like this...
-
-```
-bitfinex(BTCUSD) { myAction(); }
-```
-
-So why bother? It means shorter messages which can be really useful when they are set up in places that are hard
-to change or update. Instead you can just update the config and restart the bot and you get the new command 
-sequence next time the macro is triggered. It also means you don't need to reveal exactly what orders etc you'll
-be executing to the service that is triggering the action. 
 
 
 <h1 id="api-examples">Examples</h1>

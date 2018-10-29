@@ -156,7 +156,10 @@
  * @apiParam {String} [text] The text to use in the attachment area.
  * @apiParam {String="sms","slack","telegram"} [who=default] Which channel to send the message to. By default it sends to the channel
  *                          configured in your `config/local.json` file, but you can specify the channel here.
- *                          SMS, Slack and Telegram are support channels.
+ *                          SMS, Slack and Telegram are supported channels.
+ *
+ * @apiError (Compatibility) Telegram Instabot Trader can only send messages to telegram after you've started a chat.
+ * @apiError (Compatibility) Slack `title`, `color` and `text` are really for sending '[attachments](https://api.slack.com/docs/message-attachments)' to Slack - other services are ignoring these for now.
  *
  * @apiSuccessExample Example
  *      bitfinex(BTCUSD) {
@@ -323,12 +326,23 @@
 
 
 
-
 /**
  * @api steppedMarketOrder steppedMarketOrder
  * @apiName steppedMarketOrder
  * @apiVersion 1.0.0
- * @apiDescription Place a series of market orders over an extended period of time. The amount will be split
+ * @apiDescription This has been deprecated and is now called twapOrder. Still works the same for now though.
+ *                  See [twapOrder](#api-Command_Reference-twapOrder) for details...
+ * @apiGroup Command Reference
+ *
+ *
+ */
+
+
+/**
+ * @api twapOrder twapOrder
+ * @apiName twapOrder
+ * @apiVersion 1.0.0
+ * @apiDescription Also known as Time-Weighted Average Price (TWAP). Place a series of market orders over an extended period of time. The amount will be split
  *                      between all the orders. After each market order is executed there will be a delay for
  *                      `(duration / orderCount)` seconds. For example, if duration is 60 seconds, and the
  *                      orderCount is 10, then there will be a (60 / 10) = 6 second delay between each order.
@@ -340,6 +354,7 @@
  * @apiUse PositionInfo
  * @apiUse SideInfo
  * @apiUse AmountInfo
+ * @apiUse TagInfo
  *
  *
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
@@ -350,9 +365,53 @@
  *      # On Deribit BTC-PERPETUAL contact, place 20 buy orders spread over a 10 minute period
  *      # in order to buy 1 btc.
  *      deribit(BTC-PERPETUAL) {
- *          steppedMarketOrder(orderCount=20, amount=1, side=buy, duration=10m);
+ *          twapOrder(orderCount=20, amount=1, side=buy, duration=10m);
  *      }
  *
  *
  */
 
+/**
+ * @api icebergOrder icebergOrder
+ * @apiName icebergOrder
+ * @apiVersion 1.0.0
+ * @apiDescription An algorithmic order that breaks up a large order into smaller orders. The small orders
+ *                  are placed relative to the current price, but only if the current price is below/above
+ *                  a set limit price. The system waits for the small order to fill and when it does, places
+ *                  the next order. If the price slips too far, the order is cancelled and re-entered.
+ *                  This implementation attempts to work in the same way as the [okex iceberg order](https://support.okex.com/hc/en-us/articles/115003537571-Strategy-Order-Explanation).
+ *                  <br><br>Note: if you cancel the limit order created by this command on the exchange,
+ *                  then Instabot Trader will take that as a signal to cancel the entire iceberg order. If
+ *                  we did not do this, as soon as you cancelled an order, a new one would take it's place.
+ * @apiGroup Command Reference
+ *
+ * @apiParam {Number} totalAmount=0 The total size of the order
+ * @apiParam {Number} averageAmount=0 The average size of each of the smaller orders. The size of each
+ *                      order will between 90% and 110% of the averageAmount value.
+ * @apiParam {Number} variance=0.1% The amount to offset the order from the current price. You may provide
+ *                      a raw value (`0.001`) or a percentage (`0.1%`). For example, the buy price would
+ *                      be calculated as `current bid * (1 - variance)`. With a bid at 6000 and a variance
+ *                      of 0.1%, the order would be placed at `6000 * (1 - 0.001) = 5994`.
+ * @apiParam {Number} limitPrice When buying, the bid price must be below the limit price. When selling,
+ *                      the ask price must be above the limit price. While the price is the wrong side of
+ *                      the limit price, the iceberg order will be suspended - no new orders will be placed.
+ *                      When the price crosses back, then ordering will continue until totalAmount has been filled.
+ * @apiParam {TimeString} timeLimit=1d The amount of time to leave the iceberg order running before giving up.
+ *                      Numbers are treated as seconds. Add the postfix
+ *                      s, m, h or d to indicate seconds, minutes or hours or days. eg 12h = 12 hours.
+ * @apiParam {String="buy","sell"} [side=buy] Is this a buy order or a sell order.
+ * @apiUse TagInfo
+ *
+ *
+ * @apiSuccessExample Deribit Example
+ *      # On Deribit BTC-PERPETUAL contact, place an order to buy 1000 contracts, 50 contracts at a time,
+ *      # while the price is below 6400. Orders are place 0.02% away from the top of the order book
+ *      # If it's not fully filled after 12 hours, it will be cancelled.
+ *      # When done, send a balance and PnL report to your phone / telegram chat.
+ *      deribit(BTC-PERPETUAL) {
+ *          icebergOrder(side=buy, totalAmount=1000, averageAmount=50, variance=0.02%, limitPrice=6400, timeLimit=12h);
+ *          balance();
+ *      }
+ *
+ *
+ */
