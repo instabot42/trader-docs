@@ -292,18 +292,25 @@
  * @api scaledOrder scaledOrder
  * @apiName scaledOrder
  * @apiVersion 1.0.0
- * @apiDescription Place a series of limit orders over a range of prices
+ * @apiDescription Place a series of limit orders over a range of prices. Note that due to order size rounding implemented by
+ *                  each of the exchanges, it is possible that the final total of orders is slightly different from the
+ *                  amount requested.
  * @apiGroup Command Reference
  *
  * @apiParam {Number} [from=0] The offset from the current price to start placing orders. See `offset` in limitOrder.
- * @apiParam {Number} [to=50] The offset from the current price to finish placing orders. See `offset` in limitOrder.
- * @apiParam {Number{1-50}} [orderCount=20] The number of orders to place between `from` and `to`.
+ * @apiParam {Number} [to=100] The offset from the current price to finish placing orders. See `offset` in limitOrder.
+ * @apiParam {Number{2-100}} [orderCount=10] The number of orders to place between `from` and `to`.
  * @apiParam {String="linear","ease-in","ease-out","ease-in-out"} [easing=linear] The easing method to use when spacing the orders out in the range between
  *                              `from` and `to`.<br>
  *                              `linear` will place all the orders evenly spaced out between `from` and `to`.<br>
  *                              `ease-in` will bunch the orders up closer to `from`.<br>
  *                              `ease-out` will bunch up the orders closer to `to`.<br>
  *                              `ease-in-out` will bunch the orders up closer to `from` and `to` away from the middle of the range.
+ * @apiParam {Number{0-1}} [varyAmount=0] How much, as a percentage, should the amount of individual orders be randomised by.
+ *                              Can accept numbers, like `0.1`, or percentages like `10%`. For example, with a total amount of
+ *                              1000, and an orderCount of 10, each order will be for 100 units. With a 10% varyAmount, each
+ *                              order will be between 90 and 110 units.
+ * @apiParam {Number{0-1}} [varyPrice=0] How much, as a percentage, should the price of individual orders be randomised by.
  * @apiUse PositionInfo
  * @apiUse SideInfo
  * @apiUse AmountInfo
@@ -348,7 +355,7 @@
  *                      orderCount is 10, then there will be a (60 / 10) = 6 second delay between each order.
  * @apiGroup Command Reference
  *
- * @apiParam {Number} [orderCount=20] The number of orders to place.
+ * @apiParam {Number{1-100}} [orderCount=10] The number of orders to place.
  * @apiParam {TimeString} [duration=60s] The amount of time to spread the orders over. Supports a number in seconds,
  *                              or s, m, or h suffix for seconds, minutes and hours (eg 5m = 5 minutes, 2h = 2 hours)
  * @apiUse PositionInfo
