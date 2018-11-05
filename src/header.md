@@ -12,6 +12,18 @@ the things described here. Use only at your own risk.*
 
 **Instabot Trader 🤖** helps you to automate placing complex trades on a selection of exchanges.
 
+Place algorithmic orders, or complex sequences of trades easily...
+
+* **Accumulate / Distribute orders** (or **Iceberg orders**)
+* **Time weighted average orders**
+* **Ping Pong orders**
+* **Scaled orders** 
+* All order types are available on all exchanges (currently Deribit, Coinbase Pro and Bitfinex)
+* Basic limit, market and stop orders
+* Send yourself notifications (**SMS**, **Slack** and **Telegram**) of progress and account balances / status.
+* Chains of the above (for example, scaled order, wait a while, cancel unfilled orders, 
+  replace with market orders etc)
+
 Trigger your trades from...
 
 * **TradingView alerts**
@@ -20,14 +32,6 @@ Trigger your trades from...
   email routers like Mailgun, SMS routers like Twilio, etc).
 * even from the command line, if that's your thing.
 
-Place simple limit orders or complex sequences of trades...
-
-* **Iceberg orders** & **Scaled orders**, even on exchanges that don't offer this (like coinbase pro and Deribit)
-* **Stepped market orders** (a series of market orders spread over a period of time)
-* Basic limit, market and stop orders
-* Send yourself notifications (**SMS**, **Slack** and **Telegram**) of progress and account balances / status.
-* Chains of the above (for example, scaled order, wait a while, cancel unfilled orders, 
-  replace with market orders etc)
   
 <div id="donate">
 

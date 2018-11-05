@@ -184,7 +184,6 @@
  *
  *
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
- * @apiError (Compatibility) bitmex Does not support `%` or `%%` units in `amount`
  *
  *
  * @apiSuccessExample Bitfinex Example
@@ -219,7 +218,6 @@
  * @apiUse AmountInfo
  *
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
- * @apiError (Compatibility) bitmex Does not support `%` or `%%` units in `amount`
  *
  *
  * @apiSuccessExample Bitfinex Example
@@ -244,8 +242,7 @@
  * @apiName stopMarketOrder
  * @apiVersion 1.0.0
  * @apiDescription Place a stop market order. Where supported, the order will be placed with 'reduce only' enabled
- *                  to ensure it can only reduce your position size (not increase it). Currently this is only
- *                  supported for Bitmex. <br><br>Take care using `position` for stop orders, as the size of the order
+ *                  to ensure it can only reduce your position size (not increase it).<br><br>Take care using `position` for stop orders, as the size of the order
  *                  is calculated at the time the order is placed, not when it is executed. For example, if you
  *                  have no open positions and trigger a limit order, then immediately a stop order, the limit order
  *                  will not have been filled yet when the stop order is placed, so your position is likely to
@@ -318,7 +315,6 @@
  *
  *
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
- * @apiError (Compatibility) bitmex Does not support `%` or `%%` units in `amount`
  *
  *
  * @apiSuccessExample Deribit Example
@@ -365,7 +361,6 @@
  *
  *
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
- * @apiError (Compatibility) bitmex Does not support `%` or `%%` units in `amount`
  *
  *
  * @apiSuccessExample Deribit Example
@@ -378,11 +373,29 @@
  *
  */
 
+
+
+/**
+ * @api accDisOrder accDisOrder
+ * @apiName accDisOrder
+ * @apiVersion 1.0.0
+ * @apiDescription the Accumulate/Distribute Algorithmic order is another name for our Iceberg Order
+ *                  See [icebergOrder](#api-Command_Reference-icebergOrder) for details...
+ * @apiGroup Command Reference
+ *
+ *
+ */
+
+
 /**
  * @api icebergOrder icebergOrder
  * @apiName icebergOrder
  * @apiVersion 1.0.0
- * @apiDescription An algorithmic order that breaks up a large order into smaller orders. The small orders
+ * @apiDescription An algorithmic order that breaks up a large order into smaller orders.
+ *                  This is often also called the Accumulate / Distribute order (accDisOrder in Instabot Trader).
+ *                  NOTE: Some exchanges refer to 'Iceberg Order' as an order that is partially hidden,
+ *                  but this is not that kind of order.
+ *                  The small orders
  *                  are placed relative to the current price, but only if the current price is below/above
  *                  a set limit price. The system waits for the small order to fill and when it does, places
  *                  the next order. If the price slips too far, the order is cancelled and re-entered.
@@ -422,3 +435,62 @@
  *
  *
  */
+
+
+
+/**
+ * @api pingPongOrder pingPongOrder
+ * @apiName pingPongOrder
+ * @apiVersion 1.0.0
+ * @apiDescription This algorithmic order starts off identical to a `scaledOrder`. It places a series of
+ *                      limit orders. However, once the orders are placed, Instabot Trader waits for
+ *                      them to be filled. As soon as one of the limit orders is filled, a new limit order
+ *                      is placed, `pongDistance` away from the original on the other side of the book.
+ *                      The order completes when all the original ping orders have been filled and all
+ *                      the resulting pong orders have also been filled.
+ *                      However, if `endless` is 'true', then the pong orders will create new ping orders
+ *                      as they are filled and the whole process starts again. When in `endless` mode
+ *                      the order will never complete. If you want to cancel it, you can either manually
+ *                      cancel all the open orders on the exchange, or call `cancelOrders(tagged, tagname)`.
+ *                      The tag defaults of 'pingpong' for this order, but can be anything you like.
+ *
+ *
+ * @apiGroup Command Reference
+ *
+ * @apiParam {Number} [from=0] The offset from the current price to start placing orders. See `offset` in limitOrder.
+ * @apiParam {Number} [to=50] The offset from the current price to finish placing orders. See `offset` in limitOrder.
+ * @apiParam {Number{2-100}} [orderCount=10] The number of orders to place between `from` and `to`.
+ * @apiParam {String="linear","ease-in","ease-out","ease-in-out"} [easing=linear] The easing method to use when spacing the orders out in the range between
+ *                              `from` and `to`.<br>
+ *                              `linear` will place all the orders evenly spaced out between `from` and `to`.<br>
+ *                              `ease-in` will bunch the orders up closer to `from`.<br>
+ *                              `ease-out` will bunch up the orders closer to `to`.<br>
+ *                              `ease-in-out` will bunch the orders up closer to `from` and `to` away from the middle of the range.
+ * @apiParam {Number{0-1}} [varyAmount=0] How much, as a percentage, should the amount of individual orders be randomised by.
+ *                              Can accept numbers, like `0.1`, or percentages like `10%`. For example, with a total amount of
+ *                              1000, and an orderCount of 10, each order will be for 100 units. With a 10% varyAmount, each
+ *                              order will be between 90 and 110 units.
+ * @apiParam {Number{0-1}} [varyPrice=0] How much, as a percentage, should the price of individual orders be randomised by.
+ * @apiParam {Number} [pongDistance=20] Once a ping order has been filled, a new order is placed `pongDistance` away on the other side of the book.
+ * @apiParam {Number="true","false"} [endless=false] The Ping Pong order normally completes after the original ping order is filled and the following pong order is also filled.
+ *                              If `endless` is true, then the pong order will generate a new ping order and the process will continue forever.
+ * @apiUse PositionInfo
+ * @apiUse SideInfo
+ * @apiUse AmountInfo
+ * @apiUse TagInfo
+ *
+ *
+ * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
+ *
+ *
+ * @apiSuccessExample Deribit Example
+ *      # On Deribit BTC-28DEC18 contact, place 40 buy orders between $0 and $20 orders below
+ *      # the current price. As each order is filled, a new sell order is place $10 away.
+ *      # Once all the sells fill, the order will complete.
+ *      deribit(BTC-28DEC18) {
+ *        pingPongOrder(from=0, to=20, orderCount=40, amount=200, side=buy, pongDistance=10, endless=false)
+ *      }
+ *
+ *
+ */
+

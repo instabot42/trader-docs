@@ -1,7 +1,7 @@
 {
   "name": "Instabot Trader",
   "version": "1.0.0",
-  "description": "Auto trade anywhere from anything.",
+  "description": "Send Algorithmic orders to any exchange.",
   "title": "Instabot Trader",
 
   "header": {
