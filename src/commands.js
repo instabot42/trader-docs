@@ -472,9 +472,10 @@
  *                              order will be between 90 and 110 units.
  * @apiParam {Number{0-1}} [varyPrice=0] How much, as a percentage, should the price of individual orders be randomised by.
  * @apiParam {Number} [pongDistance=20] Once a ping order has been filled, a new order is placed `pongDistance` away on the other side of the book.
+ * @apiParam {Number} [pingAmount=0] The size of each of the individual ping orders. This will be used in preference to `amount`. The total amount needed is pingAmount * orderCount.
+ * @apiParam {Number} [pongAmount=0] The size of each of the individual pong orders. This will be used in preference to `amount`.
  * @apiParam {Number="true","false"} [endless=false] The Ping Pong order normally completes after the original ping order is filled and the following pong order is also filled.
  *                              If `endless` is true, then the pong order will generate a new ping order and the process will continue forever.
- * @apiUse PositionInfo
  * @apiUse SideInfo
  * @apiUse AmountInfo
  * @apiUse TagInfo
