@@ -110,7 +110,7 @@
  *                      `sell` will cancel all open sell orders.<br>
  *                      `all` will cancel all open orders.<br>
  *                      `session` will cancel all orders opened during the execution of this list of actions.<br>
- *                      `tagged` will cancel all orders tagged with the value of `tag`
+ *                      `tagged` will cancel all orders tagged with the value of `tag` that were created in the current session.
  * @apiParam {String} [tag] If `which` is 'tagged', then this is the tag we will look for.
  *
  *
