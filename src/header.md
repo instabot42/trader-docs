@@ -212,7 +212,52 @@ all these bits together can help you set up the bot so it can automatically trad
 TradingView, or from other services.
 
 Ideally you'd host this on a proper server, which makes a several of the steps below unnecessary, but is 
-technically harder if Devops isn't your thing.   
+technically harder if Devops isn't your thing.
+
+## Config in more depth
+
+### Credentials
+
+This section looks like this by default...
+
+```json
+"credentials": [
+    {
+      "name": "deribit",
+      "exchange": "deribit",
+      "key": "api-key",
+      "secret": "api-secret"
+    },
+    {
+      "name": "bitfinex",
+      "exchange": "bitfinex",
+      "key": "api-key",
+      "secret": "api-secret"
+    },
+    {
+      "name": "coinbase",
+      "exchange": "coinbase",
+      "endpoint": "https://api.pro.coinbase.com",
+      "key": "api-key",
+      "secret": "api-secret",
+      "passphrase": "secret-passphrase"
+    }
+  ]
+```
+
+It is an array of all the credentials you want to set up. Each entry contains the following keys:
+
+* name - this is the name you give the api keys. In commands, this is the name you will use to identify the exchange
+  and api keys to use. For example, if you set name to be `bot`, then to execute commands on this exchange with these
+  api keys you'd send `bot(BTCUSD) { wait(5s); }`.
+* exchange - this is the name of the exchange the credentials belong to. It can be one of deribit, bitfinex or coinbase.
+* key, secret, passphrase - these are the actual api keys needed to execute orders on the exchange. Typically these will
+  need read and write permissions on orders, plus read permissions on balances/wallets. The actual fields required varies
+  from exchange to exchange (eg coinbase pro requires a passphrase)
+  
+It is possible to create multiple entries on the same exchange, as long as they have different `name`s. For example,
+on Deribit you can create sub-accounts and create separate API keys for each one. You might also have multiple accounts
+on some exchanges.`
 
 ## Setting things up so you can run the bot from home
 
