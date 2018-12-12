@@ -175,6 +175,8 @@ There are several sections here that you can adjust...
                  (see [the botFather](https://core.telegram.org/bots#6-botfather)) and add the botToken
                  to the config. Once you've done that, start a chat with your new bot and have it send
                  messages executed instantly. See the section on Telegram for the commands and shortcuts.
+                 You should also set your telegram user id in `telegram.safeUser` to ensure only you can send
+                 commands using this method.
 * **Notifications** - Set up the default notification channel (or channels) and control if you get sent a 
                 notification when Instabot Trader starts up.                  
 * **Server** - here you can change the URL that your server is accessed from, and the port that it listens on
@@ -204,6 +206,79 @@ That's it, you're up and running...
 
 
 --------
+
+# Security
+
+By default, Instabot Trader listens for HTTP requests on port 3000. Requests to `/trade` will be processed. If you
+make the server visible on the open internet then this can be a risk. There are some things you can do though...
+
+* Change the `server.url` config setting and use a url that is unique. Make it long and random so no one
+  finds it by chance.
+* Change the default port.
+* Enable message signing (see below)
+* Run the server behind a load balancer or proxy that can handle SSL for you, enabling secure transmission of your 
+  messages.
+* Use IP whitelisting to limit who can see the server. Limit this to just the services that send commands for you.
+* Run it locally, not on the open internet and send it commands from the same PC. This has the obvious disadvantage of
+  not being for handling alerts from other systems such as TradingView.
+* If you use the Telegram integration, set `telegram.safeUser` your personal Telegram user id. This will ensure only
+  you can send commands via telegram.
+
+### Message Signing
+
+There are 3 levels of message signing supported...
+
+* None - messages are not signed. This is the default.
+* Password - the message must contain the secret set up in the config
+* Hash - the message must be signed with part of a sha256 hash generated using the message and the secret.
+
+You can control which option is used from the config.
+`server.security.signingMethod` can be set to `none`, `password` or `hash`.
+`server.security.secret` should be set to a password of your choice when using either `password` or `hash` methods.
+
+To add your signature to a message, add `sig:YourSignature` to the end of messages.
+
+*Examples*
+
+We'll use the following message to sign...
+
+```
+bitfinex(BTCUSD) {
+  wait(5s);
+}
+```
+
+If the signing method is `password` and the secret is set to `bitcoin`, then you need to add `sig:bitcoin`
+to the end of the message, like so...
+
+```
+bitfinex(BTCUSD) {
+  wait(5s);
+}
+sig:bitcoin
+```
+
+If the signing method is `hash` and the secret is set to `bitcoin`, then you need generate a suitable
+hash to add to the end. There is a script with the source code to do this. We'll put the message into a file
+called `message.txt` and enter the following command: `cat message.txt | npm run sign`. That should output the following :-
+
+```
+bitfinex(BTCUSD) {
+  wait(5s);
+}
+
+sig:fe83f5fed15c7841
+```
+
+It's important to note that the message content is part of the signing process, so any change to the message will need
+a new signature generating. The signature will be unique for every message you send, so you have to keep generating them.
+If you want max security though, this is the price you have to pay. 
+
+Any message received without the correct signature will be ignored.
+
+Also, don't use `bitcoin` as your password - that would suck. or `password`.
+
+
 
 # Advanced Setup (for full automation)
 
