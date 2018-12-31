@@ -89,13 +89,6 @@ Easy. You'll find **[more examples here...](#api-examples)**
 
 ## But how do I send these messages?
 
-If you use TradingView, set up an alert that triggers when you want to trade.
-Set the Alert Message to the commands you'd like to execute, like the examples above. 
-Change a couple of settings
-in TradingView and then you'll trigger some actions every time that alert fires.
-24 hours a day, 7 days a week. 
-(see the setup and config sections below for details on setting this up).
-
 Instabot Trader listens for messages sent to it over the web, so anything
 that can make HTTP requests will be able to trigger the bot to execute
 trades for you. It's possible to set it up to respond to emails, SMS messages
@@ -430,7 +423,9 @@ easier than it sounds...
 * Once you have a token, you can add it to the config in `config/local.json` and restart Instabot Trader.
 * Now you can start a chat with your new bot. Type `/help` for the help text.
 * Anything you say to the telegram bot will now to sent directly to Instabot Trader and will be treated
-  as a regular message (commands and all).
+  as a regular message (commands and all). Because of this, it is recomended that you find out your telegram
+  user id (Instabot Trader will log this if you send a message to it) and save it in the `telegram.safeUser` 
+  setting in your config. This will limit access to just that user id.
 * To make things even simpler you can create some shortcuts that you can trigger 
   Telegram using `/shortcut <name>`. The shortcuts are defined in your `config/local.json` as an array
   of objects. The example below can be executed using `/shortcut example`...
@@ -590,9 +585,9 @@ deribit(BTC-PERPETUAL) { balance() }
 bitfinex(BTCUSD) { balance() }
 ```
 
-#### Just send a message
+#### Just send a message / alert
 
-(to your preferred notification channels)
+To your preferred notification channels (see config). Perfect for alerts when triggered from something like TradingView.
 
 ```
 This text will be sent to SMS, Telegram or Slack {!}
@@ -640,5 +635,33 @@ the sequence is complete you will have an open position of 1000 contracts
 ```
 deribit(BTC-PERPETUAL) {
     steppedMarketOrder(orderCount=20, duration=10m, position=1000);
+}
+```
+
+
+#### Buy on the next dip
+
+Attempt to accumulate 10 btc in total, roughly 0.1 btc at a time (it will vary the amount randomly within 10% of 0.1), 
+when the price dips 0.4% and as long as the price remains below $4000. It will keep trying for 1 day.
+
+```
+bitfinex(BTCUSD) {
+    icebergOrder(side=buy, totalAmount=10, averageAmount=0.1, variance=0.4%, limitPrice=4000, timeLimit=1d);
+}
+```
+
+
+#### Start a simple market maker bot running
+
+This will create a simple market maker bot.
+Each time an order is filled, a matching order is placed on the other side of the book.
+These trades will actually run forever (or until they are cancelled).
+```
+bitfinex(BTCUSD) {
+  marketMakerOrder(
+    bidAmount=0.1, bidStep=5, bidCount=40,
+    askAmount=0.1, askStep=5, askCount=40,
+    spread=30,
+    autoBalance=limit, autoBalanceAt=10%)
 }
 ```

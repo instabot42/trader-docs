@@ -423,13 +423,13 @@
  * @apiUse TagInfo
  *
  *
- * @apiSuccessExample Deribit Example
- *      # On Deribit BTC-PERPETUAL contact, place an order to buy 1000 contracts, 50 contracts at a time,
+ * @apiSuccessExample Bitfinex Example
+ *      # On Bitfinex BTCUSD pair, place an order to buy 10 BTC, 0.1 BTC at a time,
  *      # while the price is below 6400. Orders are place 0.02% away from the top of the order book
  *      # If it's not fully filled after 12 hours, it will be cancelled.
- *      # When done, send a balance and PnL report to your phone / telegram chat.
- *      deribit(BTC-PERPETUAL) {
- *          icebergOrder(side=buy, totalAmount=1000, averageAmount=50, variance=0.02%, limitPrice=6400, timeLimit=12h);
+ *      # When done, send a balance report to your phone / telegram chat.
+ *      bitfinex(BTCUSD) {
+ *          icebergOrder(side=buy, totalAmount=10, averageAmount=0.1, variance=0.02%, limitPrice=6400, timeLimit=12h);
  *          balance();
  *      }
  *
@@ -474,7 +474,7 @@
  * @apiParam {Number} [pongDistance=20] Once a ping order has been filled, a new order is placed `pongDistance` away on the other side of the book.
  * @apiParam {Number} [pingAmount=0] The size of each of the individual ping orders. This will be used in preference to `amount`. The total amount needed is pingAmount * orderCount.
  * @apiParam {Number} [pongAmount=0] The size of each of the individual pong orders. This will be used in preference to `amount`.
- * @apiParam {Number="true","false"} [endless=false] The Ping Pong order normally completes after the original ping order is filled and the following pong order is also filled.
+ * @apiParam {String="true","false"} [endless=false] The Ping Pong order normally completes after the original ping order is filled and the following pong order is also filled.
  *                              If `endless` is true, then the pong order will generate a new ping order and the process will continue forever.
  * @apiUse SideInfo
  * @apiUse AmountInfo
@@ -484,14 +484,69 @@
  * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
  *
  *
- * @apiSuccessExample Deribit Example
- *      # On Deribit BTC-28DEC18 contact, place 40 buy orders between $0 and $20 orders below
- *      # the current price. As each order is filled, a new sell order is place $10 away.
+ * @apiSuccessExample Bitfinex Example
+ *      # On Bitfinex BTCUSD pair, place 40 buy orders between $0 and $20 orders below
+ *      # the current price. As each order is filled, a new sell order is place $30 away.
  *      # Once all the sells fill, the order will complete.
- *      deribit(BTC-28DEC18) {
- *        pingPongOrder(from=0, to=20, orderCount=40, amount=200, side=buy, pongDistance=10, endless=false)
+ *      bitfinex(BTCUSD) {
+ *        pingPongOrder(from=0, to=20, orderCount=40, amount=10, side=buy, pongDistance=30, endless=false)
  *      }
  *
  *
  */
 
+
+
+/**
+ * @api marketMakerOrder marketMakerOrder
+ * @apiName marketMakerOrder
+ * @apiVersion 1.0.0
+ * @apiDescription An order that creates a basic market maker bot. This essentially look like a pair of endless
+ *                  [ping pong orders](#api-Command_Reference-pingPongOrder) that are a little easier to set up. It also supports a feature to
+ *                  auto balance the position if price starts to move outside the initial range. You'll
+ *                  need to experiment with this feature, as used correctly it allows you to focus your funds in
+ *                  a tighter range, while still being able to profit from trending markets or significant moves
+ *                  outside your original range.
+ *
+ *
+ * @apiGroup Command Reference
+ *
+ * @apiParam {Number} [bidAmount=0] The amount of *each* bid
+ * @apiParam {Number} [bidStep=5] The price difference between each bid order
+ * @apiParam {Number} [bidCount=0] The number of bid orders to place initially.
+ * @apiParam {Number} [askAmount=0] The amount of *each* ask
+ * @apiParam {Number} [askStep=5] The price difference between each ask order
+ * @apiParam {Number} [askCount=0] The number of ask orders to place initially.
+ * @apiParam {Number} [spread=30] The gap between bids and asks (well, when a bid/ask is filled, how far away
+ *                                  should the opposite order be placed). In [pingPongOrder](#api-Command_Reference-pingPongOrder) terms, this is pongDistance.
+ * @apiParam {String="none","limit","market"} [autoBalance=none] When the system needs to free up funds in order to re-balance your position,
+ *                                  what method should it use. `none` means do not re-balance positions, `limit` means
+ *                                  use limit orders to re-balance, and `market` means use market orders to re-balance.
+ *                                  Note that limit orders actually use an aggressive [icebergOrder](#api-Command_Reference-icebergOrder) to ensure a quick
+ *                                  fill without paying taker fees.
+ * @apiParam {Percentage} [autoBalanceAt=20%] When the price has moved such that you are down to only N% of your orders
+ *                                  on one side of the book, start trying to re-balance by removing positions from
+ *                                  the other side of the book, exchanging the funds and placing them on the thin side.
+ *                                  For example, if you start with 50 bids and 50 asks, and the price goes up, your
+ *                                  asks will be filled and replaced with more bids. If autoBalanceAt is set to 20%,
+ *                                  and autoBalance is either 'limit' or 'market', then when you only have 20 asks left,
+ *                                  re-balancing will start. This will cause your lowest bid to be cancelled, and the
+ *                                  value bought at the current price, and a new ask being placed just above your highest
+ *                                  existing ask. Ideally you'd keep some spare funds in your account to better support
+ *                                  this balancing process.
+ * @apiUse TagInfo
+ *
+ *
+ * @apiSuccessExample Bitfinex Example
+ *      # Start a crude market maker bot on Bitfinex that runs forever.
+ *      # The initial spread will consist of 80 orders over a roughly $400 range ($200 above and below the current price)
+ *      bitfinex(BTCUSD) {
+ *        marketMakerOrder(
+ *          bidAmount=0.1, bidStep=5, bidCount=40,
+ *          askAmount=0.1, askStep=5, askCount=40,
+ *          spread=30,
+ *          autoBalance=limit, autoBalanceAt=10%)
+ *      }
+ *
+ *
+ */
