@@ -107,12 +107,19 @@ curl --data-urlencode "message=hello world" http://localhost:3000/trade
 
 ## Which exchanges are supported?
 
-* [Bitfinex](https://www.bitfinex.com/) - Spot Trading (support for margin trading soon)
+* [Bitfinex](https://www.bitfinex.com/) - Spot Trading or margin trading
 * [Deribit](https://www.deribit.com/reg-1657.8470) - Bitcoin Futures
 * [Coinbase Pro](https://pro.coinbase.com/trade/BTC-USD) - Spot Trading (BTC, LTC, ETH and Bcash)
 * Coming soon: [Bitmex](https://www.bitmex.com/register/LWpOVZ) - 100x degen gambling
 * Coming soon: Binance - shitcoin party 
 
+
+## You may also be interested in...
+
+Instabot Trader integrates well with [Alert-a-Tron](https://alertatron.com/), which makes it super simpler to capture
+alerts from TradingView, or other services, and push them various targets, with screenshots of charts attached.
+It can be used to simply forward alerts into Instabot Trader too, 
+and can simplify the setup and installation of Instabot Trader significantly.
 
 <div id="donate">
 
@@ -300,7 +307,9 @@ This section looks like this by default...
       "name": "bitfinex",
       "exchange": "bitfinex",
       "key": "api-key",
-      "secret": "api-secret"
+      "secret": "api-secret",
+      "margin": false,
+      "max-leverage": 1
     },
     {
       "name": "coinbase",

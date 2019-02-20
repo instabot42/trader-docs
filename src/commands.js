@@ -501,7 +501,7 @@
  * @api marketMakerOrder marketMakerOrder
  * @apiName marketMakerOrder
  * @apiVersion 1.0.0
- * @apiDescription An order that creates a basic market maker bot. This essentially look like a pair of endless
+ * @apiDescription An order that creates a basic market maker bot. This essentially looks like a pair of endless
  *                  [ping pong orders](#api-Command_Reference-pingPongOrder) that are a little easier to set up. It also supports a feature to
  *                  auto balance the position if price starts to move outside the initial range. You'll
  *                  need to experiment with this feature, as used correctly it allows you to focus your funds in
@@ -519,21 +519,11 @@
  * @apiParam {Number} [askCount=0] The number of ask orders to place initially.
  * @apiParam {Number} [spread=30] The gap between bids and asks (well, when a bid/ask is filled, how far away
  *                                  should the opposite order be placed). In [pingPongOrder](#api-Command_Reference-pingPongOrder) terms, this is pongDistance.
- * @apiParam {String="none","limit","market"} [autoBalance=none] When the system needs to free up funds in order to re-balance your position,
- *                                  what method should it use. `none` means do not re-balance positions, `limit` means
- *                                  use limit orders to re-balance, and `market` means use market orders to re-balance.
- *                                  Note that limit orders actually use an aggressive [icebergOrder](#api-Command_Reference-icebergOrder) to ensure a quick
- *                                  fill without paying taker fees.
- * @apiParam {Percentage} [autoBalanceAt=20%] When the price has moved such that you are down to only N% of your orders
- *                                  on one side of the book, start trying to re-balance by removing positions from
- *                                  the other side of the book, exchanging the funds and placing them on the thin side.
- *                                  For example, if you start with 50 bids and 50 asks, and the price goes up, your
- *                                  asks will be filled and replaced with more bids. If autoBalanceAt is set to 20%,
- *                                  and autoBalance is either 'limit' or 'market', then when you only have 20 asks left,
- *                                  re-balancing will start. This will cause your lowest bid to be cancelled, and the
- *                                  value bought at the current price, and a new ask being placed just above your highest
- *                                  existing ask. Ideally you'd keep some spare funds in your account to better support
- *                                  this balancing process.
+ * @apiParam {String="none","shuffle"} [autoBalance=none] When autoBalance is set to `shuffle`, Instabot Trader will attempt to shuffle your orders closer
+ *                              to the price if the prices moves outside the your order range. For example, if the prices goes up all the way through your
+ *                              asks, and keeps going, you'll be left with a lot of bids some way below the current price. When `shuffle` is on, the
+ *                              bid furthest from the price will be moved to `bidStep` above the block, effectively moving the entire block of orders
+ *                              bidStep closer to the price. This process will repeat until the bids are just below the price again.
  * @apiUse TagInfo
  *
  *
