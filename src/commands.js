@@ -524,6 +524,9 @@
  *                              asks, and keeps going, you'll be left with a lot of bids some way below the current price. When `shuffle` is on, the
  *                              bid furthest from the price will be moved to `bidStep` above the block, effectively moving the entire block of orders
  *                              bidStep closer to the price. This process will repeat until the bids are just below the price again.
+ * @apiParam {TimeString} [autoBalanceEvery=0] The number of seconds to wait between each attempt to auto balance. You can adjust this to change how
+ *              quickly Instabot Trader tries to rebalance your orders. Can also include units, so `10` is 10 seconds, `10s` is also 10 seconds, `10m`
+ *              is 10 minutes and `10h` is 10 hours.
  * @apiUse TagInfo
  *
  *
