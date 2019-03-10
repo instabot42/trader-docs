@@ -128,9 +128,9 @@ and can simplify the setup and installation of Instabot Trader significantly.
 If you're using this to help you trade 24/7, it would be great if you could throw me a few Satoshi 
 from time to time to say thanks. 
 
-* **Bitcoin**: 39vBjyAu65vYEd7thnW75V7eULTcz7wgxV
+* **Bitcoin**: 3NFKTZwmTmvyieXyez5wfegfqK2mipoWwW
 * **Litecoin**: LUov5izfzuDakBeLGGCtyzmZcwCB2nXBDY
-* **Ethereum**: 0x2F18958381D3a1025e136b5AEF727dDa132602f8
+* **Ethereum**: 0xA456DE943e64fCdf9B9C2d04d0653a752Ce6Fc3E
 
 Thank you... 🎉 
 
