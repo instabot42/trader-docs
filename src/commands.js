@@ -57,8 +57,8 @@
  *                              asset you'd like to end up with. For example, on the BTCUSD pair, position would
  *                              represent the amount of BTC you'd like to own after the order completes. If your
  *                              balance is current 4 btc and you set `position` to 3, it will result in a sell of
- *                              1btc (to take you from the current 4 btc balance to teh desired 3 btc balance).
- *                              However, if your balance was 0 btc, then it would result in a buy of 3 btc.<br<br>
+ *                              1btc (to take you from the current 4 btc balance to the desired 3 btc balance).
+ *                              However, if your balance was 0 btc, then it would result in a buy of 3 btc.<br><br>
  *                              Note that the amount to actually trade is calculated from your current
  *                              open position at the moment the
  *                              action is executed and does not take into account other open orders.<br><br>
