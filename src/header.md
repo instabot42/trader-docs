@@ -33,6 +33,23 @@ Trigger your trades from...
 * even from the command line, if that's your thing.
 
 
+
+## Which exchanges are supported?
+
+* [Bitfinex](https://www.bitfinex.com/) - Spot Trading or margin trading
+* [Deribit](https://www.deribit.com/reg-1657.8470) - Bitcoin Futures
+* [Coinbase Pro](https://pro.coinbase.com/trade/BTC-USD) - Spot Trading (BTC, LTC, ETH and Bcash)
+* [BitMEX](https://www.bitmex.com/register/LWpOVZ) (only available via [Alertatron](https://alertatron.com/) ) - 100x degen gambling
+* Coming soon: Binance - shitcoin party
+
+
+## You may also be interested in...
+
+Looking for a hosted version of Instabot Trader?  [Alertatron](https://alertatron.com/) offers a hosted edition of Instabot Trader
+that adds BitMEX support too. [Alertatron](https://alertatron.com/) can also forward your alerts, with attached charts, to Telegram,
+Discord, Slack, Email or call Webhooks.
+
+
 <div id="donate">
 
 ## Source code?
@@ -40,6 +57,8 @@ Trigger your trades from...
 [https://github.com/instabot42/instabot-trader](https://github.com/instabot42/instabot-trader)
 
 </div>
+
+
 
 ## What does it do? How does it work?
 
@@ -50,8 +69,6 @@ Each message looks a bit like this...
 
 ```
 Any text you like here...
-Want this text sent as an SMS to your phone?
-then add this somewhere-> {!}
 
 Next, we have a set of actions that
 will be executed on an exchange...
@@ -105,22 +122,6 @@ curl --data-urlencode "message=hello world" http://localhost:3000/trade
 ```
 
 
-## Which exchanges are supported?
-
-* [Bitfinex](https://www.bitfinex.com/) - Spot Trading or margin trading
-* [Deribit](https://www.deribit.com/reg-1657.8470) - Bitcoin Futures
-* [Coinbase Pro](https://pro.coinbase.com/trade/BTC-USD) - Spot Trading (BTC, LTC, ETH and Bcash)
-* Coming soon: [Bitmex](https://www.bitmex.com/register/LWpOVZ) - 100x degen gambling
-* Coming soon: Binance - shitcoin party
-
-
-## You may also be interested in...
-
-Instabot Trader integrates well with [Alert-a-Tron](https://alertatron.com/), which makes it super simpler to capture
-alerts from TradingView, or other services, and push them various targets, with screenshots of charts attached.
-It can be used to simply forward alerts into Instabot Trader too,
-and can simplify the setup and installation of Instabot Trader significantly.
-
 <div id="donate">
 
 ## All donations gratefully accepted!
@@ -141,6 +142,8 @@ Thank you... 🎉
 
 <h1 id="api-setup">Setup Guide</h1>
 
+
+
 ## Installation
 
 You'll need **[Node.js](https://nodejs.org/en/)** v10.3.0 or better to run Instabot Trader.
@@ -153,6 +156,16 @@ $ cd instabot-trader
 $ npm install
 $ npm run setup
 ```
+
+<div id="donate">
+
+### Looking for a hosted version with no setup?
+
+[https://alertatron.com/](https://alertatron.com/)
+
+</div>
+
+
 
 
 ### Edit the config

@@ -181,9 +181,15 @@
  * @apiUse SideInfo
  * @apiUse AmountInfo
  * @apiUse TagInfo
+ * @apiParam {Boolean} [postOnly=true] Attempt to submit the order as a post-only order. Not all exchanges support this - see compatibility for details
+ * @apiParam {Boolean} [reduceOnly=false] Attempt to submit the order as a reduce-only order. Not all exchanges support this - see compatibility for details
  *
  *
- * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
+ * @apiError (Compatibility) Deribit Does not support `%` or `%%` units in `amount`<br>
+ *                                  Reduce only orders can only be placed if you have an open position. The sum of all reduce-only orders can only be as large as the open position size<br>
+ *                                  Post-only orders will have their price adjusted if you attempt to place orders at invalid prices
+ * @apiError (Compatibility) Bitfinex Reduce only is not supported on spot exchanges
+ * @apiError (Compatibility) Coinbase Reduce only is not supported on spot exchanges
  *
  *
  * @apiSuccessExample Bitfinex Example
