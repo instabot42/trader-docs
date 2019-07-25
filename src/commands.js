@@ -209,6 +209,28 @@
  *
  */
 
+/**
+ * @api aggressiveEntryOrder aggressiveEntryOrder
+ * @apiName aggressiveEntryOrder
+ * @apiVersion 1.0.0
+ * @apiDescription Tries to enter a position with a limit order that stays at the top of the order book.
+ *                  The limit order is initially placed at the top of the order book. If the price moves
+ *                  away from the order, the order will be canceled and repositioned at the new top of the book.
+ * @apiGroup Command Reference
+ *
+ * @apiUse PositionInfo
+ * @apiUse SideInfo
+ * @apiUse AmountInfo
+ * @apiUse TagInfo
+ *
+ * @apiSuccessExample Deribit Example
+ *      # Enter a long position at the current price
+ *      # will keep moving the order to the top of the order book if the price goes up while waiting
+ *      deribit(BTC-PERPETUAL) {
+ *          aggressiveEntryOrder(side=buy, amount=1);
+ *      }
+ *
+ */
 
 
 
