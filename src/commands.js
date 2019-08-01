@@ -233,6 +233,34 @@
  */
 
 
+/**
+ * @api stopOrTakeProfitOrder stopOrTakeProfitOrder
+ * @apiName stopOrTakeProfitOrder
+ * @apiVersion 1.0.0
+ * @apiDescription Places a Take Profit order and a Stop Loss order at the same time. It then waits for either order to
+ *                  be filled and cancels the other one.
+ * @apiGroup Command Reference
+ *
+ * @apiParam {String="buy","sell"} side=buy Should the orders to be placed be Buy or Sell orders. If you are looking to
+ *                  take profit from a Long, then you'll to place sell orders, for example.
+ * @apiParam {Number} tp=100 The offset from the current price or absolute price at which the Take Profit should be placed.
+ *                          The order will be added as a limit order. Tha value can accept any value that is supported by limitOrders offset value.
+ * @apiParam {Number} sl=100 The offset from the current price or absolute price at which the Stop Loss order should be placed.
+ *                        The order will be added as a stopMarketOrder. It can accept any value that is supported by stopMarketOrders offset value.
+ * @apiParam {Number} amount=0 The size of the take profit and stop loss orders. The amount can be any value that is accepted by the amount field
+ *                          in a limitOrder or stopMarketOrder.
+ * @apiUse TagInfo
+ *
+ * @apiSuccessExample Deribit Example
+ *      # Enter a long position at the current price
+ *      # The place a take profit order $100 above the current price, and a stop loss order $50 below the current price.
+ *      deribit(BTC-PERPETUAL) {
+ *          aggressiveEntryOrder(side=buy, amount=1);
+ *          stopOrTakeProfitOrder(side=sell, tp=100, sl=50, amount=1);
+ *      }
+ *
+ */
+
 
 /**
  * @api marketOrder marketOrder
