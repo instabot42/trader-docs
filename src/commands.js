@@ -262,6 +262,81 @@
  */
 
 
+
+/**
+ * @api continue continue
+ * @apiName continue
+ * @apiVersion 1.0.0
+ * @apiDescription Evaluates some condition and will only continue to later commands if the condition is met.
+ *                  If the condition is not met, then this command will abort execution of the command sequence.
+ *                  Typically you would place these at the start of the command sequence. See also [stop](#api-Command_Reference-stop) which is the same, but with inverted logic.
+ * @apiGroup Command Reference
+ *
+ * @apiParam {String} if=always The name of the condition to check<br>
+ *                          **Simple Conditions**<br>
+ *                      `always` - will always be true. Value is ignored.<br>
+ *                      `never` - will always be false. Value is ignored.<br><br>
+ *                       **Date and Time**<br>
+ *                           All date and time conditions use UTC time only. Dates must be given in the format `YYYY-MM-DD` and times in the format `HH:MM`. Times are assumed to be using the 24 hour clock.<br><br>
+ *                       `isAfterDate` - true if the current date is after the date given in the value.<br>
+ *                       `isOnOrAfterDate` - true if the current date is on or after the date given in the value.<br>
+ *                       `isBeforeDate` - true if the current date is before the date given in the value.<br>
+ *                       `isOnOrBeforeDate` - true if the current date is on or before the date given in the value.<br>
+ *                       `isSameDate` - true if the current date is the same as the date given in the value.<br>
+ *                       `isAfterTime` - true if the current time is after the time given in the value.<br>
+ *                       `isBeforeTime` - true if the current time is before the time given in the value.<br><br>
+ *                       **Position Size**<br>
+ *                       Position size is your current open position. Positive values are long positions, negative values are short positions. On
+ *                       spot exchanges, the position will be considered to be the amount of the asset in your wallet (so will always be >=0)<br>
+ *                       `positionLessThan` - true if your current open position size is less than the value.<br>
+ *                       `positionLessThanEq` - true if your current open position size is less than or equal to the value.<br>
+ *                       `positionGreaterThan` - true if your current open position size is greater than the value.<br>
+ *                       `positionGreaterThanEq` - true if your current open position size is greater than or equal to the value.<br>
+ *                       `positionLong` - true if your currently have a LONG position. Value is ignored.<br>
+ *                       `positionShort` - true if your currently have a SHORT position. Value is ignored.<br>
+ *                       `positionNone` - true if you currently have no open positions at all. Value is ignored.<br><br>
+ *                       **Last Price**<br>
+ *                       The last price is calculated as the mid point between the current top bid and ask in the order book.<br>
+ *                       `priceLessThan` - true if the current price is less than the value.<br>
+ *                       `priceGreaterThan` - true if the current price is greater than the value.<br>
+ *                       `priceLessThanEq` - true if the current price is less than or equal to the value.<br>
+ *                       `priceGreaterThanEq` - true if the current price is greater than or equal to the value.<br>
+ * @apiParam {String} [value] The value to compare against, if needed. It's value will depend on the condition being tested.
+ *
+ * @apiSuccessExample Deribit Example
+ *      # Check that our current position size is less than 1000 contracts.
+ *      # If it exceeds 1000, stop and exit
+ *      # If it is under 1000, then place a limit order to buy 500 contracts
+ *      deribit(BTC-PERPETUAL) {
+ *          continue(if=positionLessThan, value=1000);
+ *          limitOrder(side=buy, amount=500, offset=10);
+ *      }
+ *
+ */
+
+/**
+ * @api stop stop
+ * @apiName stop
+ * @apiVersion 1.0.0
+ * @apiDescription Evaluates some condition and will only stop execution of the commands if it is true.
+ *                  See also [continue](#api-Command_Reference-continue) which is the same, but with inverted logic.
+ * @apiGroup Command Reference
+ *
+ * @apiParam {String} if=always The name of the condition to check<br>
+ *                          See [continue](#api-Command_Reference-continue) for all possible values.
+ * @apiParam {String} [value] The value to compare against, if needed. It's value will depend on the condition being tested.
+ *
+ * @apiSuccessExample Deribit Example
+ *      # Check the current position size and stop if it is too large.
+ *      # If it exceeds 1000, stop and exit
+ *      # If it is under 1000, then place a limit order to buy 500 contracts
+ *      deribit(BTC-PERPETUAL) {
+ *          stop(if=positionGreaterThan, value=1000);
+ *          limitOrder(side=buy, amount=500, offset=10);
+ *      }
+ *
+ */
+
 /**
  * @api marketOrder marketOrder
  * @apiName marketOrder
