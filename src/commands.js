@@ -30,15 +30,21 @@
 
 /**
  * @apiDefine AmountInfo
- * @apiParam {Number} [amount=0] The size of the order.<br><br>
+ * @apiParam {Number} [amount=0] The size of the order. The units depend on the symbol and exchange.<br><br>
  *                              How the amount if interpreted depends on the exchange. Spot exchanges like
  *                              Bitfinex will treat the amount as the quantity of the asset to buy or sell.
- *                              For example, on the BTCUSD pair the amount would be measured in BTC. These
- *                              exchanges also allow you to express the amount as a percentage of either your
- *                              total account value (eg, 50%), or as a percentage of your available funds (eg, 50%%).<br><br>
- *                              On Futures exchanges like Bitmex and Deribit, all trades are expressed in `contracts`,
- *                              so the amount would be the number of contracts to buy or sell. Normally you can only
- *                              trade a whole number of contracts, and the percentage values are not supported.<br><br>
+ *                              For example, on the BTCUSD pair the amount would be measured in BTC.<br><br>
+ *                              % can be used to allocate a percentage of your balance/equity for the order.
+ *                              For example, if you have a balance of 1 BTC and use `amount=50%`, then the order
+ *                              will be for 0.5 BTC. <br><br>
+ *                              %% can be used to allocate a percentage of available funds for your order.
+ *                              For example, if you have a balance of 1 BTC, but only 0.5 BTC is available (perhaps the rest is
+ *                              locked up in another pending order) and use `amount=50%%`, then the order
+ *                              will be for 0.25 BTC.<br><br>
+ *                              Percentage amounts are not current supported on Deribit.<br>
+ *                              Percentage amounts are supported on most (but not all) symbols on BitMEX (only available via <https://alertatron.com/>).
+ *                              XBTUSD is supported and all symbols against XBT (eg ETHXBT), but not on symbols backed against
+ *                              other currencies (eg ETHUSD, XBTJPY etc can not use % amounts and must use fixed amounts).)<br><br>
  *                              Required if `position` is not used.
  *
  */
