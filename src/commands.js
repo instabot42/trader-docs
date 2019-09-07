@@ -40,8 +40,7 @@
  *                              %% can be used to allocate a percentage of available funds for your order.
  *                              For example, if you have a balance of 1 BTC, but only 0.5 BTC is available (perhaps the rest is
  *                              locked up in another pending order) and use `amount=50%%`, then the order
- *                              will be for 0.25 BTC.<br><br>
- *                              Percentage amounts are not current supported on Deribit.<br>
+ *                              will be for 0.25 BTC (half of what is available).<br><br>
  *                              Percentage amounts are supported on most (but not all) symbols on BitMEX (only available via <https://alertatron.com/>).
  *                              XBTUSD is supported and all symbols against XBT (eg ETHXBT), but not on symbols backed against
  *                              other currencies (eg ETHUSD, XBTJPY etc can not use % amounts and must use fixed amounts).)<br><br>
@@ -191,8 +190,8 @@
  * @apiParam {Boolean} [reduceOnly=false] Attempt to submit the order as a reduce-only order. Not all exchanges support this - see compatibility for details
  *
  *
- * @apiError (Compatibility) Deribit Does not support `%` or `%%` units in `amount`<br>
- *                                  Reduce only orders can only be placed if you have an open position. The sum of all reduce-only orders can only be as large as the open position size<br>
+ * @apiError (Compatibility) Deribit    Reduce only orders can only be placed if you have an open position.
+ *                                  The sum of all reduce-only orders can only be as large as the open position size<br>
  *                                  Post-only orders will have their price adjusted if you attempt to place orders at invalid prices
  * @apiError (Compatibility) Bitfinex Reduce only is not supported on spot exchanges
  * @apiError (Compatibility) Coinbase Reduce only is not supported on spot exchanges
@@ -228,6 +227,13 @@
  * @apiUse SideInfo
  * @apiUse AmountInfo
  * @apiUse TagInfo
+ * @apiParam {TimeString} [timeLimit] The amount of time to leave the order running before giving up.
+ *                      Numbers are treated as seconds. Add the postfix
+ *                      s, m, h or d to indicate seconds, minutes or hours or days. eg 12h = 12 hours.
+ *                      If this argument is missing, there will be no time limit and the order will run until it is fully filled or cancelled.
+ * @apiParam {Number} [slippageLimit] The amount of slippage to allow before giving up. The value can anything supported in `offset` from a limitOrder,
+ *                      such as `slippageLimit=20` or `slippageLimit=1%` or `slippageLimit=@10000`
+ *                      If this argument is missing, there will be no slippage limit and the order will run until it is fully filled or cancelled.
  *
  * @apiSuccessExample Deribit Example
  *      # Enter a long position at the current price
@@ -354,9 +360,6 @@
  * @apiUse SideInfo
  * @apiUse AmountInfo
  *
- * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
- *
- *
  * @apiSuccessExample Bitfinex Example
  *      # On Bitfinex BTCUSD pair, place a market order for 1btc
  *      bitfinex(BTCUSD) {
@@ -450,10 +453,6 @@
  * @apiUse AmountInfo
  * @apiUse TagInfo
  *
- *
- * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
- *
- *
  * @apiSuccessExample Deribit Example
  *      # On Deribit BTC-PERPETUAL contact, place 20 buy orders between $5 and $100 orders below
  *      # the current price. Each order will be for 0.05btc.
@@ -470,7 +469,7 @@
  * @api steppedMarketOrder steppedMarketOrder
  * @apiName steppedMarketOrder
  * @apiVersion 1.0.0
- * @apiDescription This has been deprecated and is now called twapOrder. Still works the same for now though.
+ * @apiDescription This has been deprecated and is now called twapOrder. Still works the same though.
  *                  See [twapOrder](#api-Command_Reference-twapOrder) for details...
  * @apiGroup Command Reference
  *
@@ -495,10 +494,6 @@
  * @apiUse SideInfo
  * @apiUse AmountInfo
  * @apiUse TagInfo
- *
- *
- * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
- *
  *
  * @apiSuccessExample Deribit Example
  *      # On Deribit BTC-PERPETUAL contact, place 20 buy orders spread over a 10 minute period
@@ -616,10 +611,6 @@
  * @apiUse SideInfo
  * @apiUse AmountInfo
  * @apiUse TagInfo
- *
- *
- * @apiError (Compatibility) deribit Does not support `%` or `%%` units in `amount`
- *
  *
  * @apiSuccessExample Bitfinex Example
  *      # On Bitfinex BTCUSD pair, place 40 buy orders between $0 and $20 orders below
